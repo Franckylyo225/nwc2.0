@@ -1,26 +1,289 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+/* ============================================================================
+ * DESIGN SYSTEM — NEW WAVE CONCEPTION
+ * Palette claire, accent bleu électrique. Tous les tokens sont définis ici :
+ * change une valeur et elle se propage à tout le site.
+ * ==========================================================================*/
+@theme {
+  /* Couleurs */
+  --color-bg: #ffffff;
+  --color-surface: #f5f7fa;
+  --color-surface-2: #eef2f7;
+  --color-ink: #101114;
+  --color-ink-soft: #2e3138;
+  --color-muted: #5c6169;
+  --color-line: #e3e7ec;
+  --color-line-strong: #d3d8df;
+  --color-accent: #e82050;
+  --color-accent-hover: #c51b44;
+  --color-accent-soft: #fde9ee;
+  --color-accent-ink: #ffffff;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Typographies (injectées par next/font dans app/layout.tsx) */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
+  --font-display: var(--font-cal), var(--font-inter), ui-sans-serif, sans-serif;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  /* Rayons */
+  --radius-card: 1.25rem;
+  --radius-pill: 999px;
+
+  /* Courbes d'animation */
+  --ease-smooth: cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* Animations réutilisables */
+  --animate-marquee: marquee 40s linear infinite;
+  --animate-marquee-slow: marquee 70s linear infinite;
+
+  @keyframes marquee {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-50%);
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* --------------------------------------------------------------- BASE --- */
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    /* compense la navigation fixe lors des ancres */
+    scroll-padding-top: 6rem;
+  }
+
+  body {
+    background-color: var(--color-bg);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    -webkit-font-smoothing: antialiased;
+    text-rendering: optimizeLegibility;
+  }
+
+  ::selection {
+    background-color: var(--color-accent);
+    color: var(--color-accent-ink);
+  }
+
+  :focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 3px;
+    border-radius: 4px;
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.001ms !important;
+    }
+  }
+}
+
+/* ---------------------------------------------------------- UTILITAIRES --- */
+
+/** Largeur de page commune à toutes les sections. */
+@utility shell {
+  margin-inline: auto;
+  width: 100%;
+  max-width: 78rem;
+  padding-inline: 1.25rem;
+
+  @media (width >= 48rem) {
+    padding-inline: 2rem;
+  }
+}
+
+/** Titre d'affichage : Cal Sans, interlettrage resserré. */
+@utility display {
+  font-family: var(--font-display);
+  font-weight: 400;
+  letter-spacing: -0.03em;
+  line-height: 0.98;
+}
+
+/** Masque de fondu sur les bords, pour les bandeaux défilants. */
+@utility edge-fade {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 8%,
+    black 92%,
+    transparent
+  );
+}
+
+/* ---------------------------------------------------------- ANIMATIONS ---
+ * Règle de base : le contenu est TOUJOURS présent et visible dans le HTML.
+ * Les animations ne sont qu'une couche de confort — si le navigateur ne les
+ * gère pas, ou si le JS ne se charge pas, la page reste parfaitement lisible.
+ * ------------------------------------------------------------------------*/
+
+@keyframes rise-in {
+  from {
+    opacity: 0;
+    transform: translateY(1.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes rise-in-mask {
+  from {
+    opacity: 0;
+    transform: translateY(65%);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/** Apparition au chargement. `--delay` permet de cascader les éléments. */
+.rise,
+.rise-mask {
+  animation-duration: 0.9s;
+  animation-timing-function: var(--ease-smooth);
+  animation-fill-mode: both;
+  animation-delay: var(--delay, 0ms);
+}
+
+.rise {
+  animation-name: rise-in;
+}
+
+/** Variante « texte qui monte » : à placer dans un parent overflow-hidden. */
+.rise-mask {
+  animation-name: rise-in-mask;
+}
+
+/**
+ * Apparition au défilement, pilotée par le scroll et sans une ligne de JS.
+ * Non supportée (Firefox) → aucune règle ne s'applique, le contenu est
+ * simplement affiché normalement. C'est le comportement voulu.
+ */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .reveal {
+      animation: rise-in linear both;
+      animation-timeline: view();
+      /* Se termine dès que l'élément est à moitié entré : jamais bloqué à
+         mi-parcours, même en bas de page. */
+      animation-range: entry calc(0% + var(--stagger, 0%)) entry
+        calc(50% + var(--stagger, 0%));
+    }
+  }
+}
+
+/* ------------------------------------------------- CORPS D'ARTICLE ---
+ * Mise en forme du HTML produit par le Markdown des articles. Ces éléments
+ * n'ont pas de classes : on les stylise depuis leur conteneur.
+ * ------------------------------------------------------------------------*/
+.prose-nwc {
+  color: var(--color-ink-soft);
+  font-size: 1.0625rem;
+  line-height: 1.75;
+}
+
+.prose-nwc > * + * {
+  margin-top: 1.25em;
+}
+
+.prose-nwc h2,
+.prose-nwc h3 {
+  font-family: var(--font-display);
+  color: var(--color-ink);
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+  margin-top: 2em;
+}
+
+.prose-nwc h2 {
+  font-size: 2rem;
+}
+
+.prose-nwc h3 {
+  font-size: 1.5rem;
+}
+
+.prose-nwc a {
+  color: var(--color-accent);
+  text-underline-offset: 3px;
+  text-decoration: underline;
+}
+
+.prose-nwc strong {
+  color: var(--color-ink);
+  font-weight: 600;
+}
+
+.prose-nwc ul,
+.prose-nwc ol {
+  padding-left: 1.4em;
+}
+
+.prose-nwc ul {
+  list-style: disc;
+}
+
+.prose-nwc ol {
+  list-style: decimal;
+}
+
+.prose-nwc li + li {
+  margin-top: 0.4em;
+}
+
+.prose-nwc blockquote {
+  border-left: 3px solid var(--color-accent);
+  padding-left: 1.25em;
+  color: var(--color-muted);
+  font-style: italic;
+}
+
+.prose-nwc img {
+  border-radius: var(--radius-card);
+  width: 100%;
+}
+
+.prose-nwc code {
+  background: var(--color-surface);
+  border-radius: 0.35em;
+  padding: 0.15em 0.4em;
+  font-size: 0.9em;
+}
+
+.prose-nwc pre {
+  background: var(--color-ink);
+  color: #fff;
+  border-radius: var(--radius-card);
+  padding: 1.25em;
+  overflow-x: auto;
+}
+
+.prose-nwc pre code {
+  background: none;
+  padding: 0;
+}
+
+.prose-nwc hr {
+  border: 0;
+  border-top: 1px solid var(--color-line);
+  margin-block: 2.5em;
+}
+
+/** Grille de fond très discrète. */
+@utility grid-bg {
+  background-image:
+    linear-gradient(to right, var(--color-line) 1px, transparent 1px),
+    linear-gradient(to bottom, var(--color-line) 1px, transparent 1px);
+  background-size: 64px 64px;
 }
