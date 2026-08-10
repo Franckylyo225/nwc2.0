@@ -51,6 +51,19 @@ function slugify(input: string, fallback: string) {
   return slug || fallback;
 }
 
+/** Garantit l'unicité d'un slug au sein d'un même lot d'import (ex. plusieurs
+ *  entrées d'exemple partageant le même nom placeholder). */
+function dedupeSlug(slug: string, used: Set<string>) {
+  let candidate = slug;
+  let n = 2;
+  while (used.has(candidate)) {
+    candidate = `${slug}-${n}`;
+    n += 1;
+  }
+  used.add(candidate);
+  return candidate;
+}
+
 async function main() {
   /* ------------------------------------------------ Compte administrateur */
   const email = (process.env.ADMIN_EMAIL ?? "").trim().toLowerCase();
@@ -92,10 +105,11 @@ async function main() {
 
   /* ------------------------------------------------------- Réalisations */
   if ((await prisma.work.count()) === 0) {
+    const usedWorkSlugs = new Set<string>();
     await prisma.work.createMany({
       data: site.works.items.map((item, index) => ({
         name: item.name,
-        slug: slugify(item.name, `realisation-${index + 1}`),
+        slug: dedupeSlug(slugify(item.name, `realisation-${index + 1}`), usedWorkSlugs),
         year: item.year,
         category: item.category,
         summary: item.summary,
@@ -115,11 +129,12 @@ async function main() {
   /* ------------------------------------------------------ Projets maison */
   if ((await prisma.product.count()) === 0) {
     const statuses = { "En ligne": "ONLINE", "Bêta": "BETA", Bientôt: "SOON" } as const;
+    const usedProductSlugs = new Set<string>();
 
     await prisma.product.createMany({
       data: site.products.items.map((item, index) => ({
         name: item.name,
-        slug: slugify(item.name, `produit-${index + 1}`),
+        slug: dedupeSlug(slugify(item.name, `produit-${index + 1}`), usedProductSlugs),
         tagline: item.tagline,
         description: item.description,
         status: statuses[item.status as keyof typeof statuses] ?? "ONLINE",
