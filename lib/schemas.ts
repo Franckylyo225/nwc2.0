@@ -107,6 +107,21 @@ export const testimonialSchema = z.object({
   published,
 });
 
+export const settingsSchema = z.object({
+  maintenanceMode: published,
+  maintenanceTitle: text("Le titre", 120),
+  maintenanceMessage: text("Le message", 600),
+  maintenanceEta: z
+    .string()
+    .trim()
+    .transform((value) => (value === "" ? null : new Date(value)))
+    .nullable()
+    .refine((date) => date === null || !Number.isNaN(date.getTime()), {
+      message: "Date d'ouverture invalide.",
+    }),
+  showContact: published,
+});
+
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."),
   password: z.string().min(1, "Le mot de passe est obligatoire."),

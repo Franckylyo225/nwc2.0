@@ -11,6 +11,9 @@ export const ADMIN_SECTIONS = [
   { href: "/admin/temoignages", label: "Témoignages" },
 ] as const;
 
+/** Réglages du site — à part : ce n'est pas une collection de contenu. */
+export const ADMIN_SETTINGS = { href: "/admin/parametres", label: "Paramètres" } as const;
+
 /** En-tête d'une page admin : titre, description, bouton d'action. */
 export function PageHeader({
   title,

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ADMIN_SECTIONS } from "@/components/admin/shell";
+import { ADMIN_SECTIONS, ADMIN_SETTINGS } from "@/components/admin/shell";
 import { getCurrentUser } from "@/lib/auth";
 import { isDatabaseConfigured } from "@/lib/db";
 import { logout } from "../actions";
@@ -44,6 +44,14 @@ export default async function ProtectedLayout({
                   </Link>
                 </li>
               ))}
+              <li className="mt-2 lg:border-t lg:border-line lg:pt-2">
+                <Link
+                  href={ADMIN_SETTINGS.href}
+                  className="block rounded-xl px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink"
+                >
+                  {ADMIN_SETTINGS.label}
+                </Link>
+              </li>
             </ul>
           </nav>
 

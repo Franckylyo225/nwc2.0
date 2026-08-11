@@ -8,11 +8,13 @@ import { prisma } from "@/lib/db";
 import {
   articleSchema,
   loginSchema,
+  settingsSchema,
   productSchema,
   serviceSchema,
   testimonialSchema,
   workSchema,
 } from "@/lib/schemas";
+import { SETTINGS_ID } from "@/lib/settings";
 import { uploadImage } from "@/lib/upload";
 
 /**
@@ -23,6 +25,8 @@ export type ActionState = {
   error?: string;
   /** Erreurs par champ, pour les afficher au bon endroit. */
   fieldErrors?: Record<string, string>;
+  /** Vrai après un enregistrement réussi — sert à confirmer à l'écran. */
+  ok?: boolean;
 };
 
 /* ------------------------------------------------------ Authentification --- */
@@ -61,6 +65,43 @@ export async function login(
 export async function logout() {
   await destroySession();
   redirect("/admin/connexion");
+}
+
+/* -------------------------------------------------------------- Réglages --- */
+
+/**
+ * Enregistre les réglages du site. La table n'a qu'une ligne, d'identifiant
+ * fixe : un `upsert` la crée à la première sauvegarde puis la met à jour.
+ */
+export async function saveSettings(
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireUser();
+
+  try {
+    const parsed = settingsSchema.safeParse(Object.fromEntries(formData.entries()));
+    if (!parsed.success) {
+      return {
+        error: "Certains champs sont invalides.",
+        fieldErrors: fieldErrorsOf(parsed.error),
+      };
+    }
+
+    await prisma.siteSettings.upsert({
+      where: { id: SETTINGS_ID },
+      create: { id: SETTINGS_ID, ...parsed.data },
+      update: parsed.data,
+    });
+  } catch (error) {
+    return toMessage(error);
+  }
+
+  /* Le mode maintenance vit dans le layout du site : il faut invalider tout
+     l'arbre public, pas seulement la page d'accueil. */
+  revalidatePath("/", "layout");
+  revalidatePath("/admin/parametres");
+  return { ok: true };
 }
 
 /* ------------------------------------------------------------- Fabrique --- */

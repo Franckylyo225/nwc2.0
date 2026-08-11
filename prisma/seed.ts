@@ -88,6 +88,14 @@ async function main() {
     }
   }
 
+  /* ------------------------------------------------------------ Réglages */
+  await prisma.siteSettings.upsert({
+    where: { id: "settings" },
+    create: { id: "settings" },
+    update: {},
+  });
+  console.log("✓ Réglages du site initialisés (mode construction désactivé)");
+
   /* ------------------------------------------------------------ Services */
   if ((await prisma.service.count()) === 0) {
     await prisma.service.createMany({

@@ -43,6 +43,9 @@ next-env.d.ts
 # Client Prisma généré (recréé par `npx prisma generate`)
 /lib/generated
 
-# Variables d’environnement
-.env
-.env.local
+# Variables d’environnement — tout .env* sauf l'exemple
+.env*
+!.env.example
+# Images envoyées depuis l’administration (stockage local)
+/public/uploads/*
+!/public/uploads/.gitkeep

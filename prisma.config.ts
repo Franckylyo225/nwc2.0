@@ -20,6 +20,12 @@ export default defineConfig({
     seed: "npx tsx prisma/seed.ts",
   },
   datasource: {
-    url: process.env.DATABASE_URL,
+    /**
+     * Les migrations exigent une connexion directe : le pooler de Neon ne
+     * supporte pas les verrous de session dont Prisma a besoin. En production,
+     * DATABASE_URL pointe sur l'endpoint poolé et DIRECT_DATABASE_URL sur
+     * l'endpoint direct ; en local, une seule suffit.
+     */
+    url: process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL,
   },
 });

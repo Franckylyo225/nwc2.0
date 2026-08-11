@@ -20,6 +20,25 @@ datasource db {
   provider = "postgresql"
 }
 
+/// Réglages généraux du site. Table à ligne unique : l'identifiant est fixe,
+/// ce qui rend l'écriture idempotente (upsert) sans risque de doublon.
+model SiteSettings {
+  id                 String    @id @default("settings")
+  /// Quand il est actif, les visiteurs voient la page de maintenance.
+  /// Un administrateur connecté, lui, continue de voir le vrai site.
+  ///
+  /// Les `@map` conservent les noms de colonnes d'origine : le champ a été
+  /// renommé côté code sans migration, donc sans risque pour les données.
+  maintenanceMode    Boolean   @default(false) @map("constructionMode")
+  maintenanceTitle   String    @default("Le site arrive bientôt") @map("constructionTitle")
+  maintenanceMessage String    @default("Nous préparons quelque chose de mieux. Revenez très vite.") @map("constructionMessage")
+  /// Date de réouverture annoncée. Vide : aucune date affichée.
+  maintenanceEta     DateTime? @map("constructionEta")
+  /// Affiche ou non les coordonnées sur la page de maintenance.
+  showContact         Boolean   @default(true)
+  updatedAt           DateTime  @updatedAt
+}
+
 /// Compte d'administration. Un seul suffit, mais le modèle en accepte plusieurs.
 model AdminUser {
   id        String    @id @default(cuid())

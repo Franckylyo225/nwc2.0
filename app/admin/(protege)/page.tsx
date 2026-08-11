@@ -1,7 +1,8 @@
 import Link from "next/link";
 import { ADMIN_SECTIONS, PageHeader } from "@/components/admin/shell";
 import { prisma } from "@/lib/db";
-import { isBlobConfigured } from "@/lib/upload";
+import { getSettings } from "@/lib/settings";
+import { storageMode } from "@/lib/upload";
 
 export const dynamic = "force-dynamic";
 
@@ -27,7 +28,7 @@ async function countPair(total: () => Promise<number>, drafts: () => Promise<num
 }
 
 export default async function AdminHome() {
-  const counts = await getCounts();
+  const [counts, settings] = await Promise.all([getCounts(), getSettings()]);
 
   const cards = [
     { ...ADMIN_SECTIONS[0], ...counts.services },
@@ -43,6 +44,21 @@ export default async function AdminHome() {
         title="Tableau de bord"
         description="Tout ce qui est publié ici apparaît immédiatement sur le site."
       />
+
+      {settings.maintenanceMode ? (
+        <p className="mb-8 flex flex-wrap items-center gap-x-2 gap-y-1 rounded-card bg-accent-soft px-5 py-4 text-sm text-ink ring-1 ring-accent/25">
+          <strong className="text-accent">Le site est fermé au public.</strong>
+          <span className="text-muted">
+            Les visiteurs voient la page de maintenance.
+          </span>
+          <Link
+            href="/admin/parametres"
+            className="font-medium text-accent underline underline-offset-2"
+          >
+            Modifier
+          </Link>
+        </p>
+      ) : null}
 
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (
@@ -67,14 +83,34 @@ export default async function AdminHome() {
         ))}
       </ul>
 
-      {!isBlobConfigured() ? (
-        <p className="mt-8 rounded-card bg-surface px-5 py-4 text-sm leading-relaxed text-muted ring-1 ring-line">
-          <strong className="text-ink">Envoi d&apos;images désactivé.</strong> La
-          variable <code>BLOB_READ_WRITE_TOKEN</code> n&apos;est pas définie. En
-          attendant, colle directement l&apos;URL d&apos;une image dans les
-          formulaires — tout le reste fonctionne.
-        </p>
-      ) : null}
+      <StorageNotice />
     </>
+  );
+}
+
+/** Rappelle où atterrissent les images envoyées depuis l'administration. */
+function StorageNotice() {
+  const mode = storageMode();
+  if (mode === "blob") return null;
+
+  return (
+    <p className="mt-8 rounded-card bg-surface px-5 py-4 text-sm leading-relaxed text-muted ring-1 ring-line">
+      {mode === "local" ? (
+        <>
+          <strong className="text-ink">Images stockées sur ce serveur</strong>{" "}
+          (dossier <code>public/uploads</code>). L&apos;envoi de fichiers
+          fonctionne. Sur un hébergement sans disque persistant comme Vercel, il
+          faudra définir <code>BLOB_READ_WRITE_TOKEN</code> — les images déjà
+          enregistrées ne suivraient pas.
+        </>
+      ) : (
+        <>
+          <strong className="text-ink">Envoi de fichiers indisponible</strong> sur
+          cet hébergement : le disque n&apos;est pas persistant. Définis{" "}
+          <code>BLOB_READ_WRITE_TOKEN</code>, ou colle une URL d&apos;image dans
+          les formulaires.
+        </>
+      )}
+    </p>
   );
 }

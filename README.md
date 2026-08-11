@@ -47,10 +47,27 @@ Autres commandes : `npm run db:deploy` (migrations en production),
 
 ### Envoi d'images
 
-Facultatif. Sans `BLOB_READ_WRITE_TOKEN`, tout fonctionne — il faut simplement
-coller une URL d'image dans les formulaires au lieu d'envoyer un fichier.
-Pour l'activer : Vercel → ton projet → Storage → Blob → créer un store, puis
-copier le jeton dans `.env`. Limite : 4 Mo par image.
+L'envoi de fichiers fonctionne sans rien configurer. La destination dépend de
+l'environnement :
+
+| Situation | Destination | URL enregistrée |
+| --- | --- | --- |
+| `BLOB_READ_WRITE_TOKEN` défini | Vercel Blob | `https://…blob.vercel-storage.com/…` |
+| Sinon, en local ou sur un serveur classique | `public/uploads/` | `/uploads/mon-image-a1b2c3d4.png` |
+| Sinon, sur Vercel | *indisponible* | — un message explique quoi faire |
+
+Le stockage local suffit en développement et sur un VPS. **Sur Vercel, le jeton
+est obligatoire** : le disque y est en lecture seule et les fichiers écrits
+après le build ne sont pas servis. Vercel → ton projet → Storage → Blob → créer
+un store, puis copier le jeton dans les variables d'environnement.
+
+Chaque fichier reçoit un suffixe aléatoire : deux images du même nom ne
+s'écrasent jamais.
+
+Limite : **4 Mo par image**, formats JPG, PNG, WebP, AVIF et SVG. Cette limite
+va de pair avec `serverActions.bodySizeLimit` dans `next.config.ts` — les
+Server Actions plafonnent le corps des requêtes à 1 Mo par défaut, ce qui
+rejetterait la plupart des photos. Si tu relèves l'une, relève l'autre.
 
 ## L'administration
 
@@ -65,6 +82,8 @@ publier/dépublier, supprimer :
 | Actualités & blog | `/blog` et les 3 dernières nouvelles sur l'accueil |
 | Témoignages | Le carrousel de citations |
 
+Plus une page **Paramètres**, décrite ci-dessous.
+
 Points communs à tous les contenus :
 
 - **Ordre d'affichage** — un nombre ; les plus petits passent devant.
@@ -78,6 +97,32 @@ Le contenu des articles s'écrit en **Markdown** (`## titre`, `**gras**`,
 `- liste`, `[lien](url)`), rendu en HTML côté serveur.
 
 Toute publication rafraîchit immédiatement les pages publiques concernées.
+
+### Mode maintenance
+
+`/admin/parametres` ferme le site au public : les visiteurs voient une page
+d'attente à la place de l'accueil et du blog. Le titre, le message, une date
+d'ouverture facultative et l'affichage des coordonnées se règlent depuis la
+même page.
+
+Trois garde-fous :
+
+- **Vous continuez de voir le vrai site** tant que vous êtes connecté à
+  l'administration, avec un bandeau qui rappelle que le site est fermé — sans
+  quoi on oublie vite que les visiteurs, eux, voient une porte close.
+- **L'administration reste accessible** en permanence.
+- **Le site fermé n'est pas indexable** : `robots: noindex, nofollow` est posé
+  automatiquement sur toutes les pages publiques.
+
+Le mode est vérifié *avant* toute lecture de cookie : tant qu'il est inactif,
+la session n'est jamais consultée et les pages publiques restent prégénérées.
+
+Une réserve à connaître : la page d'attente répond en **HTTP 200**, pas 503.
+Next 16 ne permet pas de choisir le code d'état depuis un layout, et le
+middleware — qui le pourrait — tourne sur Edge, sans accès à la base. Le
+`noindex` couvre le besoin courant ; si le 503 devient nécessaire (fermeture
+longue sur un site déjà référencé), il faudra sortir le drapeau de la base
+vers une variable d'environnement lisible par le middleware.
 
 ### Sécurité
 
@@ -201,10 +246,90 @@ et trois briques de l'admin (formulaire, actions de ligne, connexion). Les
 
 Le réglage système « réduire les animations » est respecté partout.
 
-## Mise en ligne
+### Images distantes et réseaux NAT64
 
-Le plus simple est **Vercel** : pousse le dossier sur un dépôt Git, importe-le
-sur [vercel.com/new](https://vercel.com/new), rien à configurer.
+L'optimiseur d'images de Next refuse les hôtes qui résolvent vers une adresse
+privée, par protection anti-SSRF. Sur un réseau **NAT64** — fréquent chez
+certains opérateurs et sur les réseaux IPv6 seuls — un hôte pourtant public
+comme `…blob.vercel-storage.com` résout en IPv6 mappé `64:ff9b::/96`, que ce
+contrôle prend pour une adresse privée. Les images distantes renvoient alors
+`400 "url" parameter is not allowed`, alors que la configuration est correcte.
+
+Le cas ne se produit pas sur Vercel. En local, sur une machine concernée :
+
+```bash
+ALLOW_LOCAL_IP_IMAGES="true"   # dans .env
+```
+
+La protection reste active par défaut, donc en production.
+
+## Mise en ligne sur Vercel
+
+### 1. Importer le projet
+
+Pousse le dépôt sur GitHub, puis importe-le sur
+[vercel.com/new](https://vercel.com/new). Le dépôt a sa racine dans `nwc-site`,
+donc **Root Directory** reste `./`.
+
+### 2. Réglages de build
+
+| Réglage | Valeur |
+| --- | --- |
+| Framework Preset | Next.js (détecté) |
+| Build Command | *laisser par défaut* |
+| Install Command | *laisser par défaut* |
+| Node.js Version | 20.x ou plus |
+
+Rien à surcharger : Vercel exécute `vercel-build`, qui applique les migrations
+avant de construire le site (`prisma migrate deploy && next build`), et
+`postinstall` régénère le client Prisma.
+
+### 3. Variables d'environnement
+
+| Variable | Obligatoire | Valeur |
+| --- | --- | --- |
+| `DATABASE_URL` | oui | Connection string Neon, endpoint **poolé** (`-pooler` dans l'hôte) |
+| `DIRECT_DATABASE_URL` | oui | La même, endpoint **direct** (sans `-pooler`) — utilisée par les migrations |
+| `BLOB_READ_WRITE_TOKEN` | oui | Ajoutée automatiquement en connectant un store Blob au projet |
+| `ADMIN_EMAIL` | une fois | Sert au premier `db:seed`, retirable ensuite |
+| `ADMIN_PASSWORD` | une fois | Idem, 10 caractères minimum |
+
+Les deux URL Neon ne sont pas un détail : le pooler encaisse les connexions
+éphémères du runtime serverless, mais ne gère pas les verrous de session dont
+Prisma a besoin pour migrer. `prisma.config.ts` utilise `DIRECT_DATABASE_URL`
+quand elle existe, et retombe sur `DATABASE_URL` sinon — d'où une seule
+variable suffisante en local.
+
+### 4. Stockage des images
+
+Vercel → ton projet → **Storage** → **Blob** → *Create store*, en choisissant
+**l'accès public**. Le jeton `BLOB_READ_WRITE_TOKEN` est injecté automatiquement
+dans le projet.
+
+Le mode d'accès se choisit à la création et ne se change pas ensuite. Un store
+privé renverrait une erreur 403 à chaque visiteur : ses fichiers ne sont
+lisibles que via des URL signées, qui expirent — incompatible avec un site
+public dont les pages sont mises en cache.
+
+Si des images ont déjà été envoyées en stockage local, transfère-les :
+
+```bash
+npm run images:migrate -- --dry-run   # aperçu, n'écrit rien
+npm run images:migrate                # transfère et met à jour la base
+```
+
+Le script est ré-exécutable sans risque : il ignore les images déjà distantes,
+signale les fichiers introuvables sans casser le lien en base, et conserve les
+originaux dans `public/uploads/`.
+
+### 5. Premier déploiement
+
+Après le premier build, crée le compte d'administration une seule fois, depuis
+ta machine, avec le `DATABASE_URL` de production :
+
+```bash
+npm run db:seed
+```
 
 Avant de publier, pense à :
 
