@@ -35,8 +35,16 @@ model SiteSettings {
   /// Date de réouverture annoncée. Vide : aucune date affichée.
   maintenanceEta     DateTime? @map("constructionEta")
   /// Affiche ou non les coordonnées sur la page de maintenance.
-  showContact         Boolean   @default(true)
-  updatedAt           DateTime  @updatedAt
+  showContact        Boolean   @default(true)
+
+  /// Vignettes insérées entre les mots du titre d'accueil. Les emplacements
+  /// sont définis dans content/site.ts (`imageSlot`) ; seules les images se
+  /// gèrent ici, depuis l'administration.
+  heroImage1         String?
+  heroImage2         String?
+  heroImage3         String?
+
+  updatedAt          DateTime  @updatedAt
 }
 
 /// Compte d'administration. Un seul suffit, mais le modèle en accepte plusieurs.

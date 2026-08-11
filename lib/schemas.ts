@@ -120,6 +120,9 @@ export const settingsSchema = z.object({
       message: "Date d'ouverture invalide.",
     }),
   showContact: published,
+  heroImage1: optionalText,
+  heroImage2: optionalText,
+  heroImage3: optionalText,
 });
 
 export const loginSchema = z.object({

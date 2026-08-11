@@ -2,8 +2,34 @@
 
 import { useActionState, useState } from "react";
 import { saveSettings } from "@/app/admin/actions";
+import { ImageField } from "@/components/admin/ImageField";
 import { cx } from "@/components/ui";
 import type { SiteSettings } from "@/lib/settings";
+
+/**
+ * Emplacements des vignettes, dans l'ordre du titre. Les positions
+ * correspondent aux `imageSlot` déclarés dans content/site.ts.
+ */
+const HERO_SLOTS = [
+  {
+    name: "heroImage1",
+    position: 1,
+    label: "1 — après « la présence »",
+    help: "Apparaît juste avant le mot coloré du titre.",
+  },
+  {
+    name: "heroImage2",
+    position: 2,
+    label: "2 — après « des plus grandes »",
+    help: "Apparaît avant « marques ».",
+  },
+  {
+    name: "heroImage3",
+    position: 3,
+    label: "3 — après « d'Abidjan »",
+    help: "Apparaît avant « et d'ailleurs ».",
+  },
+] as const;
 
 const input =
   "w-full rounded-xl bg-white px-4 py-3 text-sm text-ink ring-1 ring-line transition-shadow placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent";
@@ -124,6 +150,35 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
           Afficher l&apos;e-mail et le téléphone sur la page d&apos;attente
         </label>
       </fieldset>
+
+      {/* --------------------------------------- Vignettes du titre --- */}
+      <section className="flex flex-col gap-5 border-t border-line pt-7">
+        <div>
+          <h2 className="text-sm font-medium text-ink">
+            Images du titre d&apos;accueil
+          </h2>
+          <p className="mt-1 text-sm leading-relaxed text-muted">
+            Trois vignettes rondes s&apos;insèrent entre les mots du grand titre.
+            Sans image, une pastille neutre occupe la place — la mise en page ne
+            bouge pas. Format conseillé : <strong>carré, 400 × 400 px minimum</strong>,
+            sujet centré, car l&apos;image est recadrée en cercle.
+          </p>
+        </div>
+
+        {HERO_SLOTS.map((slot) => (
+          <div key={slot.name} className="flex flex-col gap-2">
+            <label htmlFor={slot.name} className="text-sm font-medium text-ink">
+              {slot.label}
+            </label>
+            <ImageField
+              id={slot.name}
+              name={slot.name}
+              value={settings.heroImages[slot.position] ?? ""}
+              help={slot.help}
+            />
+          </div>
+        ))}
+      </section>
 
       <div className="flex items-center justify-end gap-4 border-t border-line pt-6">
         <span aria-live="polite" className="text-sm text-muted">

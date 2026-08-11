@@ -50,36 +50,31 @@ export const site = {
      * Le titre est découpé en fragments pour permettre la mise en page
      * « éclatée » du modèle. Chaque fragment est un mot ou groupe de mots.
      *
-     *   accent : colore le fragment dans la couleur de la marque.
-     *   image  : insère une vignette ronde JUSTE APRÈS le fragment.
+     *   accent    : colore le fragment dans la couleur de la marque.
+     *   imageSlot : insère une vignette ronde JUSTE APRÈS le fragment.
      *
-     * Pour ajouter une image : dépose le fichier dans `public/hero/`, puis
-     * renseigne son chemin ci-dessous. Tant que `src` vaut null, une pastille
-     * neutre tient la place — la mise en page ne bouge pas quand tu la
-     * remplaces.
+     * Les images elles-mêmes se déposent depuis l'administration
+     * (Paramètres → Images du titre d'accueil) : ce fichier ne décrit que
+     * les emplacements. Sans image, une pastille neutre tient la place.
      *
-     * Format conseillé : carré, 400 × 400 px minimum. L'image est recadrée en
-     * cercle et sa taille suit celle du titre.
-     *
-     * `alt` reste vide par défaut : ces vignettes sont décoratives, le sens
-     * est porté par le texte. Ne le renseigne que si l'image apporte une
-     * information que la phrase ne dit pas.
+     * Les vignettes sont décoratives : le sens est porté par le texte, elles
+     * sont donc masquées aux lecteurs d'écran.
      */
     headline: [
       { text: "Nous construisons" },
       {
         text: "la présence",
-        image: { src: null as string | null, alt: "" },
+        imageSlot: 1,
       },
       { text: "digitale", accent: true },
       {
         text: "des plus grandes",
-        image: { src: null as string | null, alt: "" },
+        imageSlot: 2,
       },
       { text: "marques" },
       {
         text: "d'Abidjan",
-        image: { src: null as string | null, alt: "" },
+        imageSlot: 3,
       },
       { text: "et d'ailleurs." },
     ],

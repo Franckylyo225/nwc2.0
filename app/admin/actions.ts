@@ -80,7 +80,18 @@ export async function saveSettings(
   await requireUser();
 
   try {
-    const parsed = settingsSchema.safeParse(Object.fromEntries(formData.entries()));
+    const raw = Object.fromEntries(formData.entries());
+
+    /* Les trois vignettes du titre : un fichier envoyé l'emporte sur l'URL
+       saisie ; sans fichier, l'URL existante est conservée. */
+    for (const field of ["heroImage1", "heroImage2", "heroImage3"] as const) {
+      const file = formData.get(`${field}File`);
+      const uploaded = await uploadImage(file instanceof File ? file : null);
+      if (uploaded) raw[field] = uploaded;
+      delete raw[`${field}File`];
+    }
+
+    const parsed = settingsSchema.safeParse(raw);
     if (!parsed.success) {
       return {
         error: "Certains champs sont invalides.",

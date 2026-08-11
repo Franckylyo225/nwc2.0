@@ -5,17 +5,12 @@ import { ArrowUpRight, Button, cx } from "./ui";
 
 const { hero, brand } = site;
 
-/** Vignette insérée dans le titre, juste après un fragment. */
-type HeadlineImage = {
-  src: string | null;
-  alt?: string;
-};
-
 /** Forme d'un fragment de titre, telle qu'écrite dans content/site.ts. */
 type HeadlinePart = {
   text: string;
   accent?: boolean;
-  image?: HeadlineImage;
+  /** Emplacement de vignette (1, 2, 3), rempli depuis l'administration. */
+  imageSlot?: number;
 };
 
 const headline: readonly HeadlinePart[] = hero.headline;
@@ -23,7 +18,12 @@ const headline: readonly HeadlinePart[] = hero.headline;
 /** Cascade d'apparition : 70 ms entre chaque élément. */
 const delay = (step: number) => ({ "--delay": `${step * 70}ms` }) as CSSProperties;
 
-export function Hero() {
+export function Hero({
+  images = {},
+}: {
+  /** Vignettes du titre, par emplacement. Fournies par les réglages du site. */
+  images?: Record<number, string | null>;
+}) {
   const afterTitle = headline.length + 1;
 
   return (
@@ -70,9 +70,9 @@ export function Hero() {
                 {part.text}
               </span>
 
-              {part.image ? (
+              {part.imageSlot ? (
                 <span className="rise inline-block" style={delay(i + 1.5)}>
-                  <HeadlineVignette image={part.image} />
+                  <HeadlineVignette src={images[part.imageSlot] ?? null} />
                 </span>
               ) : null}
             </span>
@@ -138,11 +138,11 @@ export function Hero() {
  * Tant qu'aucun fichier n'est renseigné, une pastille neutre occupe exactement
  * la même place — la mise en page ne bougera pas au moment de la remplacer.
  */
-function HeadlineVignette({ image }: { image: HeadlineImage }) {
+function HeadlineVignette({ src }: { src: string | null }) {
   const shape =
     "relative block size-[0.78em] shrink-0 overflow-hidden rounded-full ring-1 ring-line";
 
-  if (!image.src) {
+  if (!src) {
     return (
       <span
         aria-hidden
@@ -152,10 +152,11 @@ function HeadlineVignette({ image }: { image: HeadlineImage }) {
   }
 
   return (
-    <span className={shape}>
+    <span aria-hidden className={shape}>
       <Image
-        src={image.src}
-        alt={image.alt ?? ""}
+        src={src}
+        /* Décoratives : le sens est porté par le texte du titre. */
+        alt=""
         fill
         /* Le rendu ne dépasse jamais ~120 px de côté, même sur grand écran. */
         sizes="120px"

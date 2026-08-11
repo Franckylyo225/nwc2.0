@@ -6,6 +6,7 @@ import { useActionState, useEffect, useId, useState } from "react";
 import type { ActionState } from "@/app/admin/actions";
 import { slugify } from "@/lib/schemas";
 import { cx } from "@/components/ui";
+import { ImageField } from "./ImageField";
 import type { Field, FieldValues } from "./fields";
 
 /**
@@ -221,53 +222,6 @@ function FieldRow({
           {field.help}
         </p>
       ) : null}
-    </div>
-  );
-}
-
-/** Champ image : aperçu, URL modifiable à la main, et envoi de fichier. */
-function ImageField({
-  id,
-  name,
-  value,
-}: {
-  id: string;
-  name: string;
-  value: string;
-}) {
-  const [url, setUrl] = useState(value);
-
-  return (
-    <div className="flex flex-col gap-3">
-      {url ? (
-        // Aperçu simple : l'URL peut pointer n'importe où, next/image imposerait
-        // de déclarer chaque domaine distant.
-        // eslint-disable-next-line @next/next/no-img-element
-        <img
-          src={url}
-          alt=""
-          className="h-32 w-auto max-w-full rounded-xl bg-surface object-contain ring-1 ring-line"
-        />
-      ) : null}
-
-      <input
-        id={id}
-        name={name}
-        value={url}
-        onChange={(event) => setUrl(event.target.value)}
-        placeholder="https://… ou /chemin/dans/public.png"
-        className="w-full rounded-xl bg-white px-4 py-3 text-sm text-ink ring-1 ring-line focus:outline-none focus:ring-2 focus:ring-accent"
-      />
-
-      <label className="flex flex-col gap-1.5 text-sm text-muted">
-        <span>Ou envoyer un fichier (JPG, PNG, WebP, AVIF, SVG — 4 Mo max)</span>
-        <input
-          type="file"
-          name={`${name}File`}
-          accept="image/jpeg,image/png,image/webp,image/avif,image/svg+xml"
-          className="text-sm file:mr-3 file:rounded-pill file:border-0 file:bg-ink file:px-4 file:py-2 file:text-sm file:text-white hover:file:bg-accent"
-        />
-      </label>
     </div>
   );
 }

@@ -19,6 +19,7 @@ import {
   getTestimonials,
   getWorks,
 } from "@/lib/content";
+import { getSettings } from "@/lib/settings";
 
 export const metadata: Metadata = { alternates: { canonical: "/" } };
 
@@ -28,19 +29,21 @@ export const revalidate = 3600;
 
 export default async function Home() {
   /* Tout est chargé en parallèle : une section lente ne retarde pas les autres. */
-  const [services, works, testimonials, products, articles] = await Promise.all([
-    getServices(),
-    getWorks(),
-    getTestimonials(),
-    getProducts(),
-    getArticles({ limit: 3 }),
-  ]);
+  const [services, works, testimonials, products, articles, settings] =
+    await Promise.all([
+      getServices(),
+      getWorks(),
+      getTestimonials(),
+      getProducts(),
+      getArticles({ limit: 3 }),
+      getSettings(),
+    ]);
 
   return (
     <>
       <Nav />
       <main id="contenu">
-        <Hero />
+        <Hero images={settings.heroImages} />
         <TrustedBy />
         <Services items={services} />
         <Works items={works} />

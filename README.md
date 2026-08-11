@@ -82,7 +82,8 @@ publier/dépublier, supprimer :
 | Actualités & blog | `/blog` et les 3 dernières nouvelles sur l'accueil |
 | Témoignages | Le carrousel de citations |
 
-Plus une page **Paramètres**, décrite ci-dessous.
+Plus une page **Paramètres**, décrite ci-dessous : mode maintenance et images
+du titre d'accueil.
 
 Points communs à tous les contenus :
 
@@ -97,6 +98,20 @@ Le contenu des articles s'écrit en **Markdown** (`## titre`, `**gras**`,
 `- liste`, `[lien](url)`), rendu en HTML côté serveur.
 
 Toute publication rafraîchit immédiatement les pages publiques concernées.
+
+### Images du titre d'accueil
+
+Trois vignettes rondes s'insèrent entre les mots du grand titre, à la manière
+de la référence. Elles s'envoient depuis `/admin/parametres`.
+
+Les **emplacements** sont déclarés dans `content/site.ts` (`imageSlot: 1 | 2 | 3`
+sur un fragment du titre) ; les **images** vivent en base et se gèrent depuis
+l'administration. Sans image, une pastille neutre occupe exactement la même
+place : la mise en page ne bouge pas au moment de la remplacer.
+
+Format conseillé : carré, 400 × 400 px minimum, sujet centré — l'image est
+recadrée en cercle. Sa taille est exprimée en `em`, elle suit donc l'échelle du
+titre à tous les points de rupture.
 
 ### Mode maintenance
 

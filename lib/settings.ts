@@ -17,6 +17,12 @@ export type SiteSettings = {
    */
   maintenanceEtaIsFuture: boolean;
   showContact: boolean;
+  /**
+   * Vignettes du titre d'accueil, indexées par leur emplacement (1, 2, 3).
+   * Les emplacements sont déclarés dans content/site.ts ; seules les images
+   * se gèrent depuis l'administration.
+   */
+  heroImages: Record<number, string | null>;
 };
 
 /**
@@ -34,6 +40,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   maintenanceEta: null,
   maintenanceEtaIsFuture: false,
   showContact: true,
+  heroImages: { 1: null, 2: null, 3: null },
 };
 
 export async function getSettings(): Promise<SiteSettings> {
@@ -51,5 +58,10 @@ export async function getSettings(): Promise<SiteSettings> {
       ? row.maintenanceEta.getTime() > Date.now()
       : false,
     showContact: row.showContact,
+    heroImages: {
+      1: row.heroImage1,
+      2: row.heroImage2,
+      3: row.heroImage3,
+    },
   };
 }
