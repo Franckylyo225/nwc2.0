@@ -304,7 +304,7 @@ avant de construire le site (`prisma migrate deploy && next build`), et
 | Variable | Obligatoire | Valeur |
 | --- | --- | --- |
 | `DATABASE_URL` | oui | Connection string Neon, endpoint **poolé** (`-pooler` dans l'hôte) |
-| `DIRECT_DATABASE_URL` | oui | La même, endpoint **direct** (sans `-pooler`) — utilisée par les migrations |
+| `DIRECT_DATABASE_URL` | non | La même, endpoint **direct** (sans `-pooler`). Facultative : sans elle, les migrations passent par le pooler, ce qui fonctionne. |
 | `BLOB_READ_WRITE_TOKEN` | oui | Ajoutée automatiquement en connectant un store Blob au projet |
 | `ADMIN_EMAIL` | une fois | Sert au premier `db:seed`, retirable ensuite |
 | `ADMIN_PASSWORD` | une fois | Idem, 10 caractères minimum |
@@ -320,6 +320,14 @@ avant de construire le site (`prisma migrate deploy && next build`), et
 >
 > Une valeur mal formée est signalée dans les journaux de build et ignorée : le
 > déploiement se poursuit tant qu'au moins une des deux est exploitable.
+
+Pour obtenir les valeurs exactes, prêtes à coller :
+
+```bash
+npm run env:print
+```
+
+Le script lit ton `.env` local et n'envoie rien nulle part.
 
 Les deux URL Neon ne sont pas un détail : le pooler encaisse les connexions
 éphémères du runtime serverless, mais ne gère pas les verrous de session dont
