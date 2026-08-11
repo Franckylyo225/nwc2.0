@@ -45,18 +45,42 @@ export const site = {
   /* ----------------------------------------------------------------- HERO */
   hero: {
     /** Petit badge de disponibilité, en haut. Mets-le à null pour le masquer. */
-    badge: "[À REMPLIR — ex. 2 places disponibles en septembre]",
+    badge: "+25 marques nous font confiance.",
     /**
      * Le titre est découpé en fragments pour permettre la mise en page
-     * « éclatée » du modèle. Chaque fragment est un mot ou groupe de mots ;
-     * `accent` le colore en bleu, `chip` l'affiche dans une pastille.
+     * « éclatée » du modèle. Chaque fragment est un mot ou groupe de mots.
+     *
+     *   accent : colore le fragment dans la couleur de la marque.
+     *   image  : insère une vignette ronde JUSTE APRÈS le fragment.
+     *
+     * Pour ajouter une image : dépose le fichier dans `public/hero/`, puis
+     * renseigne son chemin ci-dessous. Tant que `src` vaut null, une pastille
+     * neutre tient la place — la mise en page ne bouge pas quand tu la
+     * remplaces.
+     *
+     * Format conseillé : carré, 400 × 400 px minimum. L'image est recadrée en
+     * cercle et sa taille suit celle du titre.
+     *
+     * `alt` reste vide par défaut : ces vignettes sont décoratives, le sens
+     * est porté par le texte. Ne le renseigne que si l'image apporte une
+     * information que la phrase ne dit pas.
      */
     headline: [
       { text: "Nous construisons" },
-      { text: "la présence", chip: "avatars" as const },
+      {
+        text: "la présence",
+        image: { src: null as string | null, alt: "" },
+      },
       { text: "digitale", accent: true },
-      { text: "des plus grandes marques" },
-      { text: "d'Abidjan", chip: "arrow" as const },
+      {
+        text: "des plus grandes",
+        image: { src: null as string | null, alt: "" },
+      },
+      { text: "marques" },
+      {
+        text: "d'Abidjan",
+        image: { src: null as string | null, alt: "" },
+      },
       { text: "et d'ailleurs." },
     ],
     subline:

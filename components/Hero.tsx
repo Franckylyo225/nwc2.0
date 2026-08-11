@@ -1,14 +1,21 @@
+import Image from "next/image";
 import type { CSSProperties } from "react";
 import { site } from "@/content/site";
 import { ArrowUpRight, Button, cx } from "./ui";
 
 const { hero, brand } = site;
 
+/** Vignette insérée dans le titre, juste après un fragment. */
+type HeadlineImage = {
+  src: string | null;
+  alt?: string;
+};
+
 /** Forme d'un fragment de titre, telle qu'écrite dans content/site.ts. */
 type HeadlinePart = {
   text: string;
   accent?: boolean;
-  chip?: "avatars" | "arrow";
+  image?: HeadlineImage;
 };
 
 const headline: readonly HeadlinePart[] = hero.headline;
@@ -47,7 +54,6 @@ export function Hero() {
           </div>
         ) : null}
 
-        {/* Titre « éclaté » : les fragments s'enchaînent en ligne */}
         {/* L'échelle est calée sur un titre d'environ 60 caractères. Un titre
             nettement plus long mérite de descendre d'un cran, un titre court
             supporte de monter. */}
@@ -55,7 +61,7 @@ export function Hero() {
           {headline.map((part, i) => (
             <span
               key={i}
-              className="inline-flex items-center gap-4 overflow-hidden pb-[0.12em]"
+              className="inline-flex items-center gap-3 overflow-hidden pb-[0.12em] sm:gap-4"
             >
               <span
                 className={cx("rise-mask inline-block", part.accent && "text-accent")}
@@ -63,15 +69,10 @@ export function Hero() {
               >
                 {part.text}
               </span>
-              {/* Les pastilles décoratives disparaissent sous 640 px : le
-                  conteneur doit être masqué lui aussi, sinon son `gap` laisse
-                  un trou dans le titre. */}
-              {part.chip ? (
-                <span
-                  className="rise hidden sm:inline-block"
-                  style={delay(i + 1.5)}
-                >
-                  {part.chip === "avatars" ? <AvatarChip /> : <ArrowChip />}
+
+              {part.image ? (
+                <span className="rise inline-block" style={delay(i + 1.5)}>
+                  <HeadlineVignette image={part.image} />
                 </span>
               ) : null}
             </span>
@@ -128,32 +129,38 @@ export function Hero() {
   );
 }
 
-/* Pastille « avatars » — remplace les initiales par de vraies photos clients. */
-function AvatarChip() {
-  const tones = ["bg-accent", "bg-ink", "bg-muted"];
-  return (
-    <span className="inline-flex items-center rounded-pill bg-white p-1.5 ring-1 ring-line">
-      {tones.map((tone, i) => (
-        <span
-          key={i}
-          className={cx(
-            "grid size-8 place-items-center rounded-full text-xs font-medium text-white ring-2 ring-white sm:size-10",
-            tone,
-            i > 0 && "-ml-3",
-          )}
-        >
-          ★
-        </span>
-      ))}
-    </span>
-  );
-}
+/**
+ * Vignette ronde insérée dans le titre.
+ *
+ * Sa taille est exprimée en `em` : elle suit donc l'échelle du titre à tous
+ * les points de rupture, sans réglage supplémentaire.
+ *
+ * Tant qu'aucun fichier n'est renseigné, une pastille neutre occupe exactement
+ * la même place — la mise en page ne bougera pas au moment de la remplacer.
+ */
+function HeadlineVignette({ image }: { image: HeadlineImage }) {
+  const shape =
+    "relative block size-[0.78em] shrink-0 overflow-hidden rounded-full ring-1 ring-line";
 
-/* Pastille flèche, clin d'œil au modèle de référence. */
-function ArrowChip() {
+  if (!image.src) {
+    return (
+      <span
+        aria-hidden
+        className={cx(shape, "bg-gradient-to-br from-accent/30 via-surface-2 to-surface")}
+      />
+    );
+  }
+
   return (
-    <span className="grid size-12 place-items-center rounded-pill bg-accent text-white sm:size-14">
-      <ArrowUpRight className="size-6 sm:size-7" />
+    <span className={shape}>
+      <Image
+        src={image.src}
+        alt={image.alt ?? ""}
+        fill
+        /* Le rendu ne dépasse jamais ~120 px de côté, même sur grand écran. */
+        sizes="120px"
+        className="object-cover"
+      />
     </span>
   );
 }
