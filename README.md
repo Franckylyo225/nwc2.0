@@ -295,16 +295,28 @@ donc **Root Directory** reste `./`.
 | Install Command | *laisser par défaut* |
 | Node.js Version | 20.x ou plus |
 
-Rien à surcharger : Vercel exécute `vercel-build`, qui applique les migrations
-avant de construire le site (`prisma migrate deploy && next build`), et
-`postinstall` régénère le client Prisma.
+Rien à surcharger : Vercel exécute `next build`, et `postinstall` régénère le
+client Prisma.
+
+**Les migrations ne tournent pas pendant le build**, et c'est délibéré. Prisma
+pose un verrou consultatif de session au début d'une migration ; à travers un
+pooler, la connexion est rendue au pool en conservant ce verrou, qui devient
+orphelin — la migration suivante expire alors sur `P1002`, et le déploiement
+échoue sans raison apparente.
+
+Après une modification du schéma, applique donc la migration depuis ta machine,
+**avant** de pousser :
+
+```bash
+npm run db:deploy
+```
 
 ### 3. Variables d'environnement
 
 | Variable | Obligatoire | Valeur |
 | --- | --- | --- |
 | `DATABASE_URL` | oui | Connection string Neon, endpoint **poolé** (`-pooler` dans l'hôte) |
-| `DIRECT_DATABASE_URL` | non | La même, endpoint **direct** (sans `-pooler`). Facultative : sans elle, les migrations passent par le pooler, ce qui fonctionne. |
+| `DIRECT_DATABASE_URL` | non | Inutile sur Vercel depuis que les migrations n'y tournent plus. À garder dans ton `.env` local, où elle sert à `db:deploy` et `db:migrate`. |
 | `BLOB_READ_WRITE_TOKEN` | oui | Ajoutée automatiquement en connectant un store Blob au projet |
 | `ADMIN_EMAIL` | une fois | Sert au premier `db:seed`, retirable ensuite |
 | `ADMIN_PASSWORD` | une fois | Idem, 10 caractères minimum |
@@ -359,10 +371,16 @@ originaux dans `public/uploads/`.
 
 ### Migration bloquée : `P1002`
 
-Prisma prend un verrou consultatif au démarrage d'une migration. Si le
-processus est interrompu avant de le relâcher, la session reste ouverte et
-toute migration suivante expire avec `P1002`, alors que la base répond
-normalement. Pour libérer :
+Prisma prend un verrou consultatif au démarrage d'une migration. Deux
+situations le laissent orphelin, et toute migration suivante expire alors sur
+`P1002` bien que la base réponde normalement :
+
+- le processus est interrompu avant de relâcher le verrou ;
+- la migration passe par un **pooler**, qui rend la connexion au pool sans
+  libérer le verrou de session. D'où la règle : migrer par la connexion
+  directe, jamais par l'endpoint `-pooler`.
+
+Pour libérer, via la connexion directe :
 
 ```sql
 select a.pid from pg_locks l join pg_stat_activity a on a.pid = l.pid

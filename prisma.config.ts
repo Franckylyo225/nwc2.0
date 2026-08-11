@@ -22,10 +22,16 @@ export default defineConfig({
   },
   datasource: {
     /**
-     * Les migrations exigent une connexion directe : le pooler de Neon ne
-     * supporte pas les verrous de session dont Prisma a besoin. En production,
-     * DATABASE_URL pointe sur l'endpoint poolé et DIRECT_DATABASE_URL sur
-     * l'endpoint direct ; en local, une seule suffit.
+     * Les migrations exigent une connexion DIRECTE.
+     *
+     * Prisma pose un verrou consultatif de session au début d'une migration.
+     * À travers un pooler (pgbouncer, l'endpoint `-pooler` de Neon), la
+     * connexion est rendue au pool en conservant ce verrou : il devient
+     * orphelin, et la migration suivante expire sur `P1002`.
+     *
+     * `DIRECT_DATABASE_URL` est donc à privilégier. Le repli sur
+     * `DATABASE_URL` ne vaut que pour un poste de développement, où cette
+     * dernière pointe généralement sur l'endpoint direct.
      */
     url: optionalDatabaseUrl("DIRECT_DATABASE_URL", "DATABASE_URL"),
   },
