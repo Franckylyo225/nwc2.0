@@ -359,6 +359,11 @@ fonctionner normalement, mais on ne peut plus déposer d'image.
 
 À défaut, ajoute la variable à la main : `npm run env:print` affiche la valeur.
 
+Vercel nomme la variable d'après le préfixe choisi pour le store :
+`BLOB_READ_WRITE_TOKEN` par défaut, `BLOB_<PREFIXE>_READ_WRITE_TOKEN` si tu en
+as donné un. **Les deux formes sont reconnues**, inutile de renommer quoi que
+ce soit. Les guillemets résiduels autour de la valeur sont retirés aussi.
+
 Le mode d'accès se choisit à la création et ne se change pas ensuite. Un store
 privé renverrait une erreur 403 à chaque visiteur : ses fichiers ne sont
 lisibles que via des URL signées, qui expirent — incompatible avec un site

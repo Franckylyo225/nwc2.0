@@ -12,8 +12,34 @@ const ALLOWED = ["image/jpeg", "image/png", "image/webp", "image/avif", "image/s
 const LOCAL_DIR = path.join(process.cwd(), "public", "uploads");
 const LOCAL_URL_PREFIX = "/uploads";
 
+/**
+ * Jeton Vercel Blob, quel que soit le nom sous lequel il a été enregistré.
+ *
+ * Vercel nomme la variable d'après le préfixe choisi à la création du store :
+ * `BLOB_READ_WRITE_TOKEN` par défaut, mais `BLOB_<PREFIXE>_READ_WRITE_TOKEN`
+ * dès qu'on en donne un. Chercher le seul nom par défaut laisserait un store
+ * pourtant correctement connecté passer pour absent.
+ *
+ * Les guillemets résiduels sont retirés, comme pour les URL de base.
+ */
+export function blobToken(): string | undefined {
+  const candidates = [
+    process.env.BLOB_READ_WRITE_TOKEN,
+    ...Object.entries(process.env)
+      .filter(([key]) => /^BLOB_.+_READ_WRITE_TOKEN$/.test(key))
+      .map(([, value]) => value),
+  ];
+
+  for (const raw of candidates) {
+    if (!raw) continue;
+    const cleaned = raw.trim().replace(/^['"]|['"]$/g, "").trim();
+    if (cleaned) return cleaned;
+  }
+  return undefined;
+}
+
 export function isBlobConfigured() {
-  return Boolean(process.env.BLOB_READ_WRITE_TOKEN);
+  return Boolean(blobToken());
 }
 
 /**
@@ -62,7 +88,13 @@ export async function uploadImage(file: File | null): Promise<string | null> {
 
   if (isBlobConfigured()) {
     try {
-      const blob = await put(name, file, { access: "public", addRandomSuffix: false });
+      const blob = await put(name, file, {
+        access: "public",
+        addRandomSuffix: false,
+        /* Explicite : la bibliothèque ne lit d'elle-même que le nom par
+           défaut, or le jeton peut porter un nom préfixé. */
+        token: blobToken(),
+      });
       return blob.url;
     } catch (error) {
       throw new Error(explainBlobError(error));
@@ -71,7 +103,7 @@ export async function uploadImage(file: File | null): Promise<string | null> {
 
   if (isServerless()) {
     throw new Error(
-      "L'envoi de fichiers nécessite un stockage externe sur cet hébergement. Ajoute BLOB_READ_WRITE_TOKEN dans les variables d'environnement, ou colle une URL d'image dans le champ prévu.",
+      "L'envoi de fichiers nécessite un stockage externe sur cet hébergement. Connecte un store Vercel Blob au projet — la variable peut s'appeler BLOB_READ_WRITE_TOKEN ou BLOB_<PREFIXE>_READ_WRITE_TOKEN, les deux sont reconnues. Sinon, colle une URL d'image dans le champ prévu.",
     );
   }
 
@@ -99,7 +131,7 @@ function explainBlobError(error: unknown) {
   }
 
   if (message.includes("Access denied") || message.includes("forbidden")) {
-    return "Jeton Vercel Blob refusé. Vérifie que BLOB_READ_WRITE_TOKEN correspond bien au store du projet.";
+    return "Jeton Vercel Blob refusé. Vérifie qu'il correspond bien au store connecté au projet.";
   }
 
   return `Envoi vers Vercel Blob impossible : ${message}`;
