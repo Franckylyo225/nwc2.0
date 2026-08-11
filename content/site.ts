@@ -25,7 +25,7 @@ export const site = {
     metaDescription:
       "Studio de création web. Nous concevons des sites et des identités qui donnent envie de cliquer, et qui convertissent.",
     /** Ex. "https://newwaveconception.fr" — sert aux balises SEO et à l'OG image. */
-    url: "[À REMPLIR — url du site en production]",
+    url: "https://www.nwc-agency.com",
     city: "Abidjan",
     country: "Côte d'Ivoire",
   },

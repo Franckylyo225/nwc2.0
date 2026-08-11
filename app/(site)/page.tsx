@@ -11,6 +11,7 @@ import { Services } from "@/components/Services";
 import { Testimonials } from "@/components/Testimonials";
 import { TrustedBy } from "@/components/TrustedBy";
 import { Works } from "@/components/Works";
+import type { Metadata } from "next";
 import {
   getArticles,
   getProducts,
@@ -18,6 +19,8 @@ import {
   getTestimonials,
   getWorks,
 } from "@/lib/content";
+
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 /* Les contenus viennent de la base : la page se régénère à chaque publication
    depuis l'admin (revalidatePath), sinon elle est servie depuis le cache. */

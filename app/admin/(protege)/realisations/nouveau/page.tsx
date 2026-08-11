@@ -1,18 +1,12 @@
-import { saveWork } from "@/app/admin/actions";
-import { ResourceForm } from "@/components/admin/ResourceForm";
 import { FormShell } from "@/components/admin/shell";
-import { workFields } from "../../fields";
+import { WorkForm } from "../form";
 
-export default function NewWorkPage() {
+export const dynamic = "force-dynamic";
+
+export default function NewWorkFormPage() {
   return (
     <FormShell title="Nouvelle réalisation">
-      <ResourceForm
-        fields={workFields}
-        values={{ published: true, position: 0, year: String(new Date().getFullYear()) }}
-        action={saveWork.bind(null, null)}
-        backHref="/admin/realisations"
-        submitLabel="Créer le projet"
-      />
+      <WorkForm />
     </FormShell>
   );
 }

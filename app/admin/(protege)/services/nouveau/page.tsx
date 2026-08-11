@@ -1,18 +1,12 @@
-import { saveService } from "@/app/admin/actions";
-import { ResourceForm } from "@/components/admin/ResourceForm";
 import { FormShell } from "@/components/admin/shell";
-import { serviceFields } from "../../fields";
+import { ServiceForm } from "../form";
 
-export default function NewServicePage() {
+export const dynamic = "force-dynamic";
+
+export default function NewServiceFormPage() {
   return (
     <FormShell title="Nouveau service">
-      <ResourceForm
-        fields={serviceFields}
-        values={{ published: true, position: 0 }}
-        action={saveService.bind(null, null)}
-        backHref="/admin/services"
-        submitLabel="Créer le service"
-      />
+      <ServiceForm />
     </FormShell>
   );
 }

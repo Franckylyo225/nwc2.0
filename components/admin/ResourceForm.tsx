@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useId, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useActionState, useEffect, useId, useState } from "react";
 import type { ActionState } from "@/app/admin/actions";
 import { slugify } from "@/lib/schemas";
 import { cx } from "@/components/ui";
@@ -19,14 +20,32 @@ export function ResourceForm({
   action,
   backHref,
   submitLabel = "Enregistrer",
+  variant = "page",
 }: {
   fields: Field[];
   values: FieldValues;
   action: (previous: ActionState, formData: FormData) => Promise<ActionState>;
   backHref: string;
   submitLabel?: string;
+  /** « drawer » : le formulaire est dans le panneau latéral. */
+  variant?: "page" | "drawer";
 }) {
   const [state, formAction, pending] = useActionState(action, {});
+  const router = useRouter();
+
+  /**
+   * Après un enregistrement réussi, on quitte le formulaire.
+   *
+   * Depuis le panneau, il faut remonter dans l'historique : c'est ce qui
+   * démonte la route interceptée. Une redirection serveur, elle, laisserait
+   * le panneau ouvert par-dessus la liste déjà à jour.
+   */
+  useEffect(() => {
+    if (!state.ok) return;
+    if (variant === "drawer") router.back();
+    else router.push(backHref);
+    router.refresh();
+  }, [state.ok, variant, router, backHref]);
 
   /* Le slug se remplit tout seul tant que l'utilisateur n'y a pas touché. */
   const [slug, setSlug] = useState(String(values.slug ?? ""));
@@ -61,12 +80,22 @@ export function ResourceForm({
       ))}
 
       <div className="sticky bottom-0 -mx-6 flex items-center justify-end gap-3 border-t border-line bg-bg/90 px-6 py-4 backdrop-blur">
-        <Link
-          href={backHref}
-          className="rounded-pill px-5 py-2.5 text-sm text-muted transition-colors hover:text-ink"
-        >
-          Annuler
-        </Link>
+        {variant === "drawer" ? (
+          <button
+            type="button"
+            onClick={() => router.back()}
+            className="rounded-pill px-5 py-2.5 text-sm text-muted transition-colors hover:text-ink"
+          >
+            Annuler
+          </button>
+        ) : (
+          <Link
+            href={backHref}
+            className="rounded-pill px-5 py-2.5 text-sm text-muted transition-colors hover:text-ink"
+          >
+            Annuler
+          </Link>
+        )}
         <button
           type="submit"
           disabled={pending}

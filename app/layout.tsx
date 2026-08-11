@@ -18,6 +18,12 @@ const calSans = Cal_Sans({
 });
 
 export const metadata: Metadata = {
+  /**
+   * Sans `metadataBase`, les URL relatives des balises Open Graph et des liens
+   * canoniques restent relatives — les réseaux sociaux ne savent alors pas
+   * résoudre l'image de partage.
+   */
+  metadataBase: new URL(site.brand.url),
   title: {
     default: site.brand.metaTitle,
     template: `%s — ${site.brand.name}`,
@@ -27,6 +33,7 @@ export const metadata: Metadata = {
     title: site.brand.metaTitle,
     description: site.brand.metaDescription,
     siteName: site.brand.name,
+    url: site.brand.url,
     locale: "fr_FR",
     type: "website",
   },

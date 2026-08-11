@@ -14,6 +14,7 @@ export const metadata: Metadata = {
   title: "Actualités & blog",
   description:
     "Les annonces du studio et nos partis pris sur la conception web, le design et la performance.",
+  alternates: { canonical: "/blog" },
 };
 
 const FILTERS = [

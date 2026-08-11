@@ -217,7 +217,11 @@ function makeActions<S extends z.ZodType>(options: {
       }
 
       revalidateAll(collection);
-      redirect(ADMIN_PATH[collection]);
+
+      /* Pas de `redirect` ici : depuis une route interceptée, il ne referme
+         pas le panneau. C'est ResourceForm qui navigue, selon qu'il est
+         affiché en page pleine ou en panneau latéral. */
+      return { ok: true };
     },
 
     async remove(id: string): Promise<ActionState> {
