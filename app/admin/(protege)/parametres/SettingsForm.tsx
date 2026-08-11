@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useRef, useState } from "react";
 import { saveSettings } from "@/app/admin/actions";
 import { ImageField } from "@/components/admin/ImageField";
 import { cx } from "@/components/ui";
@@ -31,6 +31,13 @@ const HERO_SLOTS = [
   },
 ] as const;
 
+const TABS = [
+  { id: "maintenance", label: "Mode maintenance" },
+  { id: "hero", label: "Images du titre" },
+] as const;
+
+type TabId = (typeof TABS)[number]["id"];
+
 const input =
   "w-full rounded-xl bg-white px-4 py-3 text-sm text-ink ring-1 ring-line transition-shadow placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent";
 
@@ -42,10 +49,30 @@ export function SettingsForm({
   storage: "blob" | "server";
 }) {
   const [state, formAction, pending] = useActionState(saveSettings, {});
+  const [tab, setTab] = useState<TabId>("maintenance");
 
   /* L'interrupteur pilote l'affichage des champs qui n'ont de sens
      qu'en mode maintenance. */
   const [active, setActive] = useState(settings.maintenanceMode);
+
+  const tabRefs = useRef<Record<string, HTMLButtonElement | null>>({});
+
+  /* Flèches gauche/droite entre les onglets, comme l'attend un lecteur
+     d'écran sur ce motif. */
+  function onTabKeyDown(event: React.KeyboardEvent) {
+    const index = TABS.findIndex((t) => t.id === tab);
+    const next =
+      event.key === "ArrowRight"
+        ? (index + 1) % TABS.length
+        : event.key === "ArrowLeft"
+          ? (index - 1 + TABS.length) % TABS.length
+          : null;
+
+    if (next === null) return;
+    event.preventDefault();
+    setTab(TABS[next].id);
+    tabRefs.current[TABS[next].id]?.focus();
+  }
 
   return (
     <form action={formAction} className="flex flex-col gap-7">
@@ -58,118 +85,159 @@ export function SettingsForm({
         </p>
       ) : null}
 
-      {/* Interrupteur principal */}
-      <label
-        className={cx(
-          "flex cursor-pointer items-start gap-4 rounded-card p-5 ring-1 transition-colors",
-          active ? "bg-accent-soft ring-accent/30" : "bg-white ring-line",
-        )}
+      {/* Onglets */}
+      <div role="tablist" aria-label="Réglages" className="flex gap-1 border-b border-line">
+        {TABS.map((item) => {
+          const selected = item.id === tab;
+          return (
+            <button
+              key={item.id}
+              ref={(el) => {
+                tabRefs.current[item.id] = el;
+              }}
+              type="button"
+              role="tab"
+              id={`tab-${item.id}`}
+              aria-selected={selected}
+              aria-controls={`panel-${item.id}`}
+              tabIndex={selected ? 0 : -1}
+              onClick={() => setTab(item.id)}
+              onKeyDown={onTabKeyDown}
+              className={cx(
+                "-mb-px border-b-2 px-4 py-3 text-sm font-medium transition-colors",
+                selected
+                  ? "border-accent text-ink"
+                  : "border-transparent text-muted hover:text-ink",
+              )}
+            >
+              {item.label}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* ------------------------------------------ Onglet 1 : maintenance */}
+      {/* Les panneaux restent montés : masqués, leurs champs continuent
+          d'accompagner le formulaire, donc rien ne se perd en changeant
+          d'onglet. */}
+      <div
+        role="tabpanel"
+        id="panel-maintenance"
+        aria-labelledby="tab-maintenance"
+        hidden={tab !== "maintenance"}
+        className="flex flex-col gap-7"
       >
-        <input
-          type="checkbox"
-          name="maintenanceMode"
-          defaultChecked={settings.maintenanceMode}
-          onChange={(event) => setActive(event.target.checked)}
-          className="mt-0.5 size-4 accent-[var(--color-accent)]"
-        />
-        <span>
-          <span className="block text-sm font-medium text-ink">
-            Activer le mode maintenance
-          </span>
-          <span className="mt-1 block text-sm leading-relaxed text-muted">
-            Les visiteurs voient une page d&apos;attente à la place du site.
-            Connecté à l&apos;administration, vous continuez de voir le vrai site
-            avec un bandeau de rappel.
-          </span>
-        </span>
-      </label>
-
-      <fieldset
-        disabled={!active}
-        className={cx(
-          "flex flex-col gap-7 transition-opacity",
-          !active && "pointer-events-none opacity-45",
-        )}
-      >
-        <div className="flex flex-col gap-2">
-          <label htmlFor="maintenanceTitle" className="text-sm font-medium text-ink">
-            Titre affiché
-          </label>
-          <input
-            id="maintenanceTitle"
-            name="maintenanceTitle"
-            defaultValue={settings.maintenanceTitle}
-            className={input}
-          />
-          {state.fieldErrors?.maintenanceTitle ? (
-            <p role="alert" className="text-sm text-accent">
-              {state.fieldErrors.maintenanceTitle}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label
-            htmlFor="maintenanceMessage"
-            className="text-sm font-medium text-ink"
-          >
-            Message
-          </label>
-          <textarea
-            id="maintenanceMessage"
-            name="maintenanceMessage"
-            rows={3}
-            defaultValue={settings.maintenanceMessage}
-            className={input}
-          />
-          {state.fieldErrors?.maintenanceMessage ? (
-            <p role="alert" className="text-sm text-accent">
-              {state.fieldErrors.maintenanceMessage}
-            </p>
-          ) : null}
-        </div>
-
-        <div className="flex flex-col gap-2">
-          <label htmlFor="maintenanceEta" className="text-sm font-medium text-ink">
-            Date d&apos;ouverture annoncée
-          </label>
-          <input
-            id="maintenanceEta"
-            name="maintenanceEta"
-            type="date"
-            defaultValue={settings.maintenanceEta?.toISOString().slice(0, 10) ?? ""}
-            className={input}
-          />
-          <p className="text-sm text-muted">
-            Facultatif. Laissée vide, ou déjà passée, aucune date n&apos;est
-            affichée.
-          </p>
-        </div>
-
-        <label className="flex items-center gap-3 text-sm text-ink">
+        <label
+          className={cx(
+            "flex cursor-pointer items-start gap-4 rounded-card p-5 ring-1 transition-colors",
+            active ? "bg-accent-soft ring-accent/30" : "bg-white ring-line",
+          )}
+        >
           <input
             type="checkbox"
-            name="showContact"
-            defaultChecked={settings.showContact}
-            className="size-4 accent-[var(--color-accent)]"
+            name="maintenanceMode"
+            defaultChecked={settings.maintenanceMode}
+            onChange={(event) => setActive(event.target.checked)}
+            className="mt-0.5 size-4 accent-[var(--color-accent)]"
           />
-          Afficher l&apos;e-mail et le téléphone sur la page d&apos;attente
+          <span>
+            <span className="block text-sm font-medium text-ink">
+              Activer le mode maintenance
+            </span>
+            <span className="mt-1 block text-sm leading-relaxed text-muted">
+              Les visiteurs voient une page d&apos;attente à la place du site.
+              Connecté à l&apos;administration, vous continuez de voir le vrai site
+              avec un bandeau de rappel.
+            </span>
+          </span>
         </label>
-      </fieldset>
 
-      {/* --------------------------------------- Vignettes du titre --- */}
-      <section className="flex flex-col gap-5 border-t border-line pt-7">
-        <div>
-          <h2 className="text-sm font-medium text-ink">
-            Images du titre d&apos;accueil
-          </h2>
-          <p className="mt-1 text-sm leading-relaxed text-muted">
-            Trois vignettes rondes s&apos;insèrent entre les mots du grand titre.
-            Sans image, une pastille neutre occupe la place — la mise en page ne
-            bouge pas. Format conseillé : <strong>carré, 400 × 400 px minimum</strong>,
-            sujet centré, car l&apos;image est recadrée en cercle.
-          </p>
-        </div>
+        <fieldset
+          disabled={!active}
+          className={cx(
+            "flex flex-col gap-7 transition-opacity",
+            !active && "pointer-events-none opacity-45",
+          )}
+        >
+          <div className="flex flex-col gap-2">
+            <label htmlFor="maintenanceTitle" className="text-sm font-medium text-ink">
+              Titre affiché
+            </label>
+            <input
+              id="maintenanceTitle"
+              name="maintenanceTitle"
+              defaultValue={settings.maintenanceTitle}
+              className={input}
+            />
+            {state.fieldErrors?.maintenanceTitle ? (
+              <p role="alert" className="text-sm text-accent">
+                {state.fieldErrors.maintenanceTitle}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="maintenanceMessage" className="text-sm font-medium text-ink">
+              Message
+            </label>
+            <textarea
+              id="maintenanceMessage"
+              name="maintenanceMessage"
+              rows={3}
+              defaultValue={settings.maintenanceMessage}
+              className={input}
+            />
+            {state.fieldErrors?.maintenanceMessage ? (
+              <p role="alert" className="text-sm text-accent">
+                {state.fieldErrors.maintenanceMessage}
+              </p>
+            ) : null}
+          </div>
+
+          <div className="flex flex-col gap-2">
+            <label htmlFor="maintenanceEta" className="text-sm font-medium text-ink">
+              Date d&apos;ouverture annoncée
+            </label>
+            <input
+              id="maintenanceEta"
+              name="maintenanceEta"
+              type="date"
+              defaultValue={settings.maintenanceEta?.toISOString().slice(0, 10) ?? ""}
+              className={input}
+            />
+            <p className="text-sm text-muted">
+              Facultatif. Laissée vide, ou déjà passée, aucune date n&apos;est
+              affichée.
+            </p>
+          </div>
+
+          <label className="flex items-center gap-3 text-sm text-ink">
+            <input
+              type="checkbox"
+              name="showContact"
+              defaultChecked={settings.showContact}
+              className="size-4 accent-[var(--color-accent)]"
+            />
+            Afficher l&apos;e-mail et le téléphone sur la page d&apos;attente
+          </label>
+        </fieldset>
+      </div>
+
+      {/* ------------------------------------------- Onglet 2 : vignettes */}
+      <div
+        role="tabpanel"
+        id="panel-hero"
+        aria-labelledby="tab-hero"
+        hidden={tab !== "hero"}
+        className="flex flex-col gap-6"
+      >
+        <p className="text-sm leading-relaxed text-muted">
+          Trois vignettes rondes s&apos;insèrent entre les mots du grand titre.
+          Sans image, une pastille neutre occupe la place — la mise en page ne
+          bouge pas. Format conseillé :{" "}
+          <strong>carré, 400 × 400 px minimum</strong>, sujet centré, car
+          l&apos;image est recadrée en cercle.
+        </p>
 
         {HERO_SLOTS.map((slot) => (
           <div key={slot.name} className="flex flex-col gap-2">
@@ -185,7 +253,7 @@ export function SettingsForm({
             />
           </div>
         ))}
-      </section>
+      </div>
 
       <div className="flex items-center justify-end gap-4 border-t border-line pt-6">
         <span aria-live="polite" className="text-sm text-muted">
