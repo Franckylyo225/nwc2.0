@@ -350,8 +350,14 @@ variable suffisante en local.
 ### 4. Stockage des images
 
 Vercel → ton projet → **Storage** → **Blob** → *Create store*, en choisissant
-**l'accès public**. Le jeton `BLOB_READ_WRITE_TOKEN` est injecté automatiquement
-dans le projet.
+**l'accès public**.
+
+**Créer le store ne suffit pas : il faut le connecter au projet.** Le jeton
+`BLOB_READ_WRITE_TOKEN` n'est injecté qu'à ce moment-là. Sans lui, l'admin
+refuse les envois de fichiers avec un message explicite — le site continue de
+fonctionner normalement, mais on ne peut plus déposer d'image.
+
+À défaut, ajoute la variable à la main : `npm run env:print` affiche la valeur.
 
 Le mode d'accès se choisit à la création et ne se change pas ensuite. Un store
 privé renverrait une erreur 403 à chaque visiteur : ses fichiers ne sont

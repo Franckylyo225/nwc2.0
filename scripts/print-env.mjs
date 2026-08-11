@@ -33,6 +33,10 @@ console.log("\nÀ coller dans Vercel → Settings → Environment Variables");
 console.log("Coche bien « Production ». Aucune guillemet autour des valeurs.\n");
 console.log("DATABASE_URL");
 console.log(withHost(pooled));
-console.log("\nDIRECT_DATABASE_URL  (facultatif — supprime-la en cas de doute)");
+console.log("\nDIRECT_DATABASE_URL  (inutile sur Vercel : les migrations n'y tournent pas)");
 console.log(withHost(direct));
+
+const blob = (process.env.BLOB_READ_WRITE_TOKEN ?? "").trim().replace(/^['"]|['"]$/g, "");
+console.log("\nBLOB_READ_WRITE_TOKEN  (obligatoire pour l'envoi d'images sur Vercel)");
+console.log(blob || "— absent du .env local —");
 console.log("");
