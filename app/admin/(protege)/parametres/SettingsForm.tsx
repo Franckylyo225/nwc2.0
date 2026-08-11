@@ -34,7 +34,13 @@ const HERO_SLOTS = [
 const input =
   "w-full rounded-xl bg-white px-4 py-3 text-sm text-ink ring-1 ring-line transition-shadow placeholder:text-muted/60 focus:outline-none focus:ring-2 focus:ring-accent";
 
-export function SettingsForm({ settings }: { settings: SiteSettings }) {
+export function SettingsForm({
+  settings,
+  storage,
+}: {
+  settings: SiteSettings;
+  storage: "blob" | "server";
+}) {
   const [state, formAction, pending] = useActionState(saveSettings, {});
 
   /* L'interrupteur pilote l'affichage des champs qui n'ont de sens
@@ -175,6 +181,7 @@ export function SettingsForm({ settings }: { settings: SiteSettings }) {
               name={slot.name}
               value={settings.heroImages[slot.position] ?? ""}
               help={slot.help}
+              mode={storage}
             />
           </div>
         ))}

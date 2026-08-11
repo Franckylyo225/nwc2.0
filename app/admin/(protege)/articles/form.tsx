@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { saveArticle } from "@/app/admin/actions";
 import { ResourceForm } from "@/components/admin/ResourceForm";
 import { prisma } from "@/lib/db";
+import { storageMode } from "@/lib/upload";
 import { articleFields } from "../fields";
 
 /**
@@ -43,6 +44,7 @@ export async function ArticleForm({
       }
       action={saveArticle.bind(null, row?.id ?? null)}
       variant={variant}
+      storage={storageMode() === "blob" ? "blob" : "server"}
       backHref="/admin/articles"
       submitLabel={row ? "Enregistrer" : "Créer l'article"}
     />

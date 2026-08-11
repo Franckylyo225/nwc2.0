@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { saveProduct } from "@/app/admin/actions";
 import { ResourceForm } from "@/components/admin/ResourceForm";
 import { prisma } from "@/lib/db";
+import { storageMode } from "@/lib/upload";
 import { productFields } from "../fields";
 
 /**
@@ -39,6 +40,7 @@ export async function ProductForm({
       }
       action={saveProduct.bind(null, row?.id ?? null)}
       variant={variant}
+      storage={storageMode() === "blob" ? "blob" : "server"}
       backHref="/admin/produits"
       submitLabel={row ? "Enregistrer" : "Créer le produit"}
     />

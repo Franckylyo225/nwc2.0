@@ -22,6 +22,7 @@ export function ResourceForm({
   backHref,
   submitLabel = "Enregistrer",
   variant = "page",
+  storage = "server",
 }: {
   fields: Field[];
   values: FieldValues;
@@ -30,6 +31,8 @@ export function ResourceForm({
   submitLabel?: string;
   /** « drawer » : le formulaire est dans le panneau latéral. */
   variant?: "page" | "drawer";
+  /** Destination des fichiers envoyés — décidée côté serveur. */
+  storage?: "blob" | "server";
 }) {
   const [state, formAction, pending] = useActionState(action, {});
   const router = useRouter();
@@ -69,6 +72,7 @@ export function ResourceForm({
           field={field}
           value={values[field.name]}
           error={state.fieldErrors?.[field.name]}
+          storage={storage}
           slug={slug}
           onSlugSourceChange={(text) => {
             if (!slugTouched) setSlug(slugify(text));
@@ -115,6 +119,7 @@ function FieldRow({
   field,
   value,
   error,
+  storage,
   slug,
   onSlugSourceChange,
   onSlugChange,
@@ -122,6 +127,7 @@ function FieldRow({
   field: Field;
   value: FieldValues[string];
   error?: string;
+  storage: "blob" | "server";
   slug: string;
   onSlugSourceChange: (text: string) => void;
   onSlugChange: (next: string) => void;
@@ -186,7 +192,12 @@ function FieldRow({
           {field.label}
         </label>
       ) : field.type === "image" ? (
-        <ImageField id={id} name={field.name} value={String(value ?? "")} />
+        <ImageField
+          id={id}
+          name={field.name}
+          value={String(value ?? "")}
+          mode={storage}
+        />
       ) : field.type === "slug" ? (
         <input
           id={id}

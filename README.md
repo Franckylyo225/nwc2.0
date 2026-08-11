@@ -64,10 +64,19 @@ un store, puis copier le jeton dans les variables d'environnement.
 Chaque fichier reçoit un suffixe aléatoire : deux images du même nom ne
 s'écrasent jamais.
 
-Limite : **4 Mo par image**, formats JPG, PNG, WebP, AVIF et SVG. Cette limite
-va de pair avec `serverActions.bodySizeLimit` dans `next.config.ts` — les
-Server Actions plafonnent le corps des requêtes à 1 Mo par défaut, ce qui
-rejetterait la plupart des photos. Si tu relèves l'une, relève l'autre.
+Formats acceptés : JPG, PNG, WebP, AVIF et SVG.
+
+**Sur Vercel, le fichier part directement du navigateur vers Blob** — limite
+8 Mo. C'est indispensable : la plateforme plafonne à 4,5 Mo le corps d'une
+requête vers une fonction serverless, quelle que soit la configuration de Next.
+Une photo un peu lourde postée au serveur est rejetée par un `413` avant
+d'atteindre le code. La route `/api/blob-upload` délivre le jeton d'envoi, et
+seulement à un administrateur connecté.
+
+**En local et sur un serveur classique**, le fichier accompagne le formulaire
+et le serveur l'écrit sur disque — limite 4 Mo, alignée sur
+`serverActions.bodySizeLimit` dans `next.config.ts`. Si tu relèves l'une,
+relève l'autre.
 
 ## L'administration
 

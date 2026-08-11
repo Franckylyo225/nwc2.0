@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { saveService } from "@/app/admin/actions";
 import { ResourceForm } from "@/components/admin/ResourceForm";
 import { prisma } from "@/lib/db";
+import { storageMode } from "@/lib/upload";
 import { serviceFields } from "../fields";
 
 /**
@@ -34,6 +35,7 @@ export async function ServiceForm({
       }
       action={saveService.bind(null, row?.id ?? null)}
       variant={variant}
+      storage={storageMode() === "blob" ? "blob" : "server"}
       backHref="/admin/services"
       submitLabel={row ? "Enregistrer" : "Créer le service"}
     />

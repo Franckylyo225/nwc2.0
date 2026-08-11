@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { saveTestimonial } from "@/app/admin/actions";
 import { ResourceForm } from "@/components/admin/ResourceForm";
 import { prisma } from "@/lib/db";
+import { storageMode } from "@/lib/upload";
 import { testimonialFields } from "../fields";
 
 /**
@@ -36,6 +37,7 @@ export async function TestimonialForm({
       }
       action={saveTestimonial.bind(null, row?.id ?? null)}
       variant={variant}
+      storage={storageMode() === "blob" ? "blob" : "server"}
       backHref="/admin/temoignages"
       submitLabel={row ? "Enregistrer" : "Créer le témoignage"}
     />

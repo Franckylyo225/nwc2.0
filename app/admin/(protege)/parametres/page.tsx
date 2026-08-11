@@ -1,5 +1,6 @@
 import { PageHeader } from "@/components/admin/shell";
 import { getSettings } from "@/lib/settings";
+import { storageMode } from "@/lib/upload";
 import { SettingsForm } from "./SettingsForm";
 
 export const dynamic = "force-dynamic";
@@ -15,7 +16,10 @@ export default async function SettingsPage() {
       />
 
       <div className="rounded-card bg-surface/40 px-6 py-7 ring-1 ring-line">
-        <SettingsForm settings={settings} />
+        <SettingsForm
+          settings={settings}
+          storage={storageMode() === "blob" ? "blob" : "server"}
+        />
       </div>
 
       <p className="mt-6 text-sm leading-relaxed text-muted">

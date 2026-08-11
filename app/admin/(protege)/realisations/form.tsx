@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { saveWork } from "@/app/admin/actions";
 import { ResourceForm } from "@/components/admin/ResourceForm";
 import { prisma } from "@/lib/db";
+import { storageMode } from "@/lib/upload";
 import { workFields } from "../fields";
 
 /**
@@ -38,6 +39,7 @@ export async function WorkForm({
       }
       action={saveWork.bind(null, row?.id ?? null)}
       variant={variant}
+      storage={storageMode() === "blob" ? "blob" : "server"}
       backHref="/admin/realisations"
       submitLabel={row ? "Enregistrer" : "Créer le projet"}
     />
