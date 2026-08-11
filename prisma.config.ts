@@ -1,5 +1,6 @@
 import path from "node:path";
 import { defineConfig } from "prisma/config";
+import { optionalDatabaseUrl } from "./lib/database-url";
 
 /**
  * Configuration des commandes Prisma (migrate, db, studio…).
@@ -26,6 +27,6 @@ export default defineConfig({
      * DATABASE_URL pointe sur l'endpoint poolé et DIRECT_DATABASE_URL sur
      * l'endpoint direct ; en local, une seule suffit.
      */
-    url: process.env.DIRECT_DATABASE_URL ?? process.env.DATABASE_URL,
+    url: optionalDatabaseUrl("DIRECT_DATABASE_URL", "DATABASE_URL"),
   },
 });

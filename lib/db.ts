@@ -1,4 +1,5 @@
 import { PrismaPg } from "@prisma/adapter-pg";
+import { readDatabaseUrl, resolveDatabaseUrl } from "./database-url";
 import { PrismaClient } from "./generated/prisma";
 
 /**
@@ -18,16 +19,11 @@ const globalForPrisma = globalThis as unknown as {
  * consultable et constructible avant la mise en place de la base.
  */
 export function isDatabaseConfigured() {
-  return Boolean(process.env.DATABASE_URL);
+  return Boolean(readDatabaseUrl("DATABASE_URL"));
 }
 
 function createClient() {
-  const connectionString = process.env.DATABASE_URL;
-  if (!connectionString) {
-    throw new Error(
-      "DATABASE_URL n'est pas définie. Copie .env.example vers .env et renseigne l'URL de la base.",
-    );
-  }
+  const connectionString = resolveDatabaseUrl("DATABASE_URL");
   return new PrismaClient({ adapter: new PrismaPg({ connectionString }) });
 }
 

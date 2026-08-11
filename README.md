@@ -294,6 +294,11 @@ avant de construire le site (`prisma migrate deploy && next build`), et
 | `ADMIN_EMAIL` | une fois | Sert au premier `db:seed`, retirable ensuite |
 | `ADMIN_PASSWORD` | une fois | Idem, 10 caractères minimum |
 
+> **Colle les valeurs sans guillemets.** Dans un fichier `.env` on écrit
+> `DATABASE_URL="postgresql://…"` ; dans l'interface de Vercel, on saisit
+> uniquement `postgresql://…`. Avec les guillemets, la chaîne commence par un
+> `"` et le build échoue sur `P1013: the scheme is not recognized`.
+
 Les deux URL Neon ne sont pas un détail : le pooler encaisse les connexions
 éphémères du runtime serverless, mais ne gère pas les verrous de session dont
 Prisma a besoin pour migrer. `prisma.config.ts` utilise `DIRECT_DATABASE_URL`
@@ -321,6 +326,20 @@ npm run images:migrate                # transfère et met à jour la base
 Le script est ré-exécutable sans risque : il ignore les images déjà distantes,
 signale les fichiers introuvables sans casser le lien en base, et conserve les
 originaux dans `public/uploads/`.
+
+### Migration bloquée : `P1002`
+
+Prisma prend un verrou consultatif au démarrage d'une migration. Si le
+processus est interrompu avant de le relâcher, la session reste ouverte et
+toute migration suivante expire avec `P1002`, alors que la base répond
+normalement. Pour libérer :
+
+```sql
+select a.pid from pg_locks l join pg_stat_activity a on a.pid = l.pid
+where l.locktype = 'advisory' and a.state = 'idle';
+-- puis, pour chaque pid trouvé :
+select pg_terminate_backend(<pid>);
+```
 
 ### 5. Premier déploiement
 

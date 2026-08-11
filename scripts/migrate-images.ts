@@ -14,6 +14,7 @@ import path from "node:path";
 import { readFile } from "node:fs/promises";
 import { put } from "@vercel/blob";
 import { PrismaPg } from "@prisma/adapter-pg";
+import { resolveDatabaseUrl } from "../lib/database-url";
 import { PrismaClient } from "../lib/generated/prisma";
 
 try {
@@ -26,9 +27,11 @@ const dryRun = process.argv.includes("--dry-run");
 const LOCAL_PREFIX = "/uploads/";
 const PUBLIC_DIR = path.join(process.cwd(), "public");
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
-  console.error("\n✗ DATABASE_URL manquante. Renseigne-la dans .env.\n");
+let connectionString: string;
+try {
+  connectionString = resolveDatabaseUrl("DATABASE_URL");
+} catch (error) {
+  console.error(`\n✗ ${error instanceof Error ? error.message : error}\n`);
   process.exit(1);
 }
 
