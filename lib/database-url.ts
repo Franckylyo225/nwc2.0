@@ -27,40 +27,52 @@ export function readDatabaseUrl(name: string): string | undefined {
   return cleaned || undefined;
 }
 
-function assertScheme(name: string, url: string) {
-  if (!SCHEMES.test(url)) {
-    throw new Error(
-      `${name} ne commence pas par « postgresql:// » (valeur reçue : « ${url.slice(0, 24)}… »). ` +
-        `Chez un hébergeur, la valeur se saisit SANS guillemets autour.`,
-    );
-  }
+function describe(name: string, url: string) {
+  return (
+    `${name} n'est pas une chaîne de connexion : « ${url.slice(0, 32)}… ». ` +
+    `Attendu : postgresql://utilisateur:motdepasse@hote/base?sslmode=require — ` +
+    `la chaîne ENTIÈRE, pas seulement le nom d'hôte, et sans guillemets autour.`
+  );
 }
 
 /**
  * Première URL exploitable parmi les variables données, ou `undefined`.
  *
- * Une valeur présente mais mal formée lève une erreur : mieux vaut échouer
- * en nommant la variable fautive que laisser Prisma répondre « P1013 ».
+ * Une valeur mal formée est signalée puis ignorée, et l'on passe à la
+ * suivante. Bloquer toute une installation parce qu'une variable secondaire
+ * — `DIRECT_DATABASE_URL` par exemple — est mal saisie serait disproportionné :
+ * l'avertissement reste visible dans les journaux de build.
  */
 export function optionalDatabaseUrl(...names: string[]): string | undefined {
   for (const name of names) {
     const url = readDatabaseUrl(name);
     if (!url) continue;
-    assertScheme(name, url);
+
+    if (!SCHEMES.test(url)) {
+      console.warn(`⚠ ${describe(name, url)} Variable ignorée.`);
+      continue;
+    }
     return url;
   }
   return undefined;
 }
 
 /**
- * Comme `optionalDatabaseUrl`, mais exige qu'une URL soit trouvée.
+ * Comme `optionalDatabaseUrl`, mais exige qu'une URL soit trouvée. Utilisé là
+ * où l'application ne peut rien faire sans base.
  */
 export function resolveDatabaseUrl(...names: string[]): string {
   const url = optionalDatabaseUrl(...names);
   if (url) return url;
 
+  const malformed = names.filter((name) => {
+    const value = readDatabaseUrl(name);
+    return value && !SCHEMES.test(value);
+  });
+
   throw new Error(
-    `Aucune URL de base de données exploitable. Renseigne ${names.join(" ou ")} ` +
-      `(valeur non vide, sans guillemets).`,
+    malformed.length > 0
+      ? describe(malformed[0], readDatabaseUrl(malformed[0]) ?? "")
+      : `Aucune URL de base de données. Renseigne ${names.join(" ou ")}.`,
   );
 }

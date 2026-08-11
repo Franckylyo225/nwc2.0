@@ -309,10 +309,17 @@ avant de construire le site (`prisma migrate deploy && next build`), et
 | `ADMIN_EMAIL` | une fois | Sert au premier `db:seed`, retirable ensuite |
 | `ADMIN_PASSWORD` | une fois | Idem, 10 caractères minimum |
 
-> **Colle les valeurs sans guillemets.** Dans un fichier `.env` on écrit
+> **Les deux variables prennent la chaîne de connexion ENTIÈRE**, pas seulement
+> le nom d'hôte :
+> `postgresql://utilisateur:motdepasse@hote/base?sslmode=require`.
+> Seul l'hôte diffère entre les deux (`-pooler` ou non).
+>
+> **Et sans guillemets.** Dans un fichier `.env` on écrit
 > `DATABASE_URL="postgresql://…"` ; dans l'interface de Vercel, on saisit
-> uniquement `postgresql://…`. Avec les guillemets, la chaîne commence par un
-> `"` et le build échoue sur `P1013: the scheme is not recognized`.
+> uniquement `postgresql://…`.
+>
+> Une valeur mal formée est signalée dans les journaux de build et ignorée : le
+> déploiement se poursuit tant qu'au moins une des deux est exploitable.
 
 Les deux URL Neon ne sont pas un détail : le pooler encaisse les connexions
 éphémères du runtime serverless, mais ne gère pas les verrous de session dont
