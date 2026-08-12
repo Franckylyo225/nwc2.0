@@ -12,7 +12,7 @@ export default async function SettingsPage() {
     <div className="max-w-2xl">
       <PageHeader
         title="Paramètres"
-        description="L'ouverture du site au public et les visuels du titre d'accueil."
+        description="L'ouverture du site au public et les visuels des blocs de l'accueil."
       />
 
       <div className="rounded-card bg-surface/40 px-6 py-7 ring-1 ring-line">

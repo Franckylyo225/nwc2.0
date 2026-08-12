@@ -44,6 +44,15 @@ model SiteSettings {
   heroImage2         String?
   heroImage3         String?
 
+  /// Visuels des blocs du site, gérés depuis l'onglet « CMS » des paramètres.
+  /// Même principe que les vignettes ci-dessus : la mise en page vit dans le
+  /// code, les images en base. Vides, les blocs affichent leur repli dégradé.
+  ///
+  /// Fond de la grande carte de présentation, avant les services.
+  aboutBannerImage   String?
+  /// Portrait ou photo d'équipe de la section « Le studio ».
+  aboutStudioImage   String?
+
   updatedAt          DateTime  @updatedAt
 }
 

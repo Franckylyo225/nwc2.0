@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/content/site";
-import { ArrowUpRight, Button, cx } from "./ui";
+import { ArrowUpRight, BrandMark, Button, cx } from "./ui";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -138,23 +138,10 @@ export function Nav() {
 /** Monogramme « NWC » — remplace-le par ton logo si tu en as un. */
 function Logo() {
   return (
+    /* Le nom de la marque n'est écrit qu'à partir de `sm` : l'icône porte donc
+       le nom accessible du lien, sans quoi il serait vide sur mobile. */
     <span className="grid size-10 place-items-center rounded-[0.7rem] bg-ink text-white transition-colors group-hover:bg-accent">
-      <svg viewBox="0 0 24 24" fill="none" aria-hidden className="size-5">
-        <title>New Wave Conception</title>
-        <path
-          d="M2 15c2.2-3.4 4-3.4 6.2 0s4 3.4 6.2 0 4-3.4 6.2 0"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-        />
-        <path
-          d="M2 9c2.2-3.4 4-3.4 6.2 0s4 3.4 6.2 0 4-3.4 6.2 0"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          opacity="0.45"
-        />
-      </svg>
+      <BrandMark title="New Wave Conception" />
     </span>
   );
 }

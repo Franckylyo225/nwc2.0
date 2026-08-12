@@ -1,4 +1,5 @@
 import { About } from "@/components/About";
+import { AboutBanner } from "@/components/AboutBanner";
 import { Cta } from "@/components/Cta";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
@@ -45,10 +46,11 @@ export default async function Home() {
       <main id="contenu">
         <Hero images={settings.heroImages} />
         <TrustedBy />
+        <AboutBanner image={settings.blockImages.aboutBanner} />
         <Services items={services} />
         <Works items={works} />
         <Testimonials items={testimonials} />
-        <About />
+        <About image={settings.blockImages.aboutStudio} />
         <Process />
         <Products items={products} />
         <LatestArticles items={articles} />

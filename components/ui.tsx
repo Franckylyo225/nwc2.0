@@ -132,6 +132,46 @@ export function Section({
 
 /* -------------------------------------------------------------- Icônes SVG */
 
+/**
+ * Les deux vagues de la marque, en `currentColor`.
+ *
+ * `title` donne un nom accessible à l'icône : à ne renseigner QUE lorsque le
+ * nom de la marque n'est pas déjà écrit en toutes lettres à côté — sinon un
+ * lecteur d'écran l'annonce deux fois. Sans `title`, l'icône est décorative.
+ */
+export function BrandMark({
+  className,
+  title,
+}: {
+  className?: string;
+  title?: string;
+}) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden={title ? undefined : true}
+      role={title ? "img" : undefined}
+      className={cx("size-5", className)}
+    >
+      {title ? <title>{title}</title> : null}
+      <path
+        d="M2 15c2.2-3.4 4-3.4 6.2 0s4 3.4 6.2 0 4-3.4 6.2 0"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+      />
+      <path
+        d="M2 9c2.2-3.4 4-3.4 6.2 0s4 3.4 6.2 0 4-3.4 6.2 0"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        opacity="0.45"
+      />
+    </svg>
+  );
+}
+
 export function ArrowUpRight({ className }: { className?: string }) {
   return (
     <svg

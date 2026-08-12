@@ -6,6 +6,7 @@ import type { z } from "zod";
 import { createSession, destroySession, requireUser, verifyPassword } from "@/lib/auth";
 import { prisma } from "@/lib/db";
 import {
+  SETTINGS_IMAGE_FIELDS,
   articleSchema,
   loginSchema,
   settingsSchema,
@@ -82,9 +83,9 @@ export async function saveSettings(
   try {
     const raw = Object.fromEntries(formData.entries());
 
-    /* Les trois vignettes du titre : un fichier envoyé l'emporte sur l'URL
+    /* Toutes les images des réglages : un fichier envoyé l'emporte sur l'URL
        saisie ; sans fichier, l'URL existante est conservée. */
-    for (const field of ["heroImage1", "heroImage2", "heroImage3"] as const) {
+    for (const field of SETTINGS_IMAGE_FIELDS) {
       const file = formData.get(`${field}File`);
       const uploaded = await uploadImage(file instanceof File ? file : null);
       if (uploaded) raw[field] = uploaded;

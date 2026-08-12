@@ -132,6 +132,44 @@ export const site = {
     ],
   },
 
+  /* ------------------------------------------------- BANDEAU DE PRÉSENTATION
+   * Grande carte sombre posée juste avant les services : une déclaration
+   * d'intention, plus une carte de chiffres qui défile.
+   *
+   * À distinguer de `about` plus bas, qui développe le studio en détail. Ce
+   * bandeau-ci pose l'ambition en deux phrases ; l'autre raconte.
+   * ------------------------------------------------------------------------*/
+  aboutBanner: {
+    title: "Des solutions logicielles de dernière génération pour vous propulser",
+    text:
+      "Chez NWC, nous sommes bien plus qu'une simple agence web : nous sommes des innovateurs, des experts en résolution de problèmes et des passionnés de technologie, déterminés à créer des solutions numériques qui favorisent le succès. Animés par une profonde passion pour les solutions performantes, modernes et évolutives, nous aidons nos partenaires à garder une longueur d'avance dans un environnement numérique en constante évolution.",
+    /* La photo de fond se dépose depuis l'administration (Paramètres → CMS).
+       Sans elle, la carte reste sombre et lisible : le dégradé tient la place,
+       la mise en page ne bouge pas au moment de la remplacer. */
+    /**
+     * Chiffres présentés dans la carte flottante. Ils défilent horizontalement,
+     * un par un. Trois entrées correspondent aux trois pastilles ; ajoute ou
+     * retire des lignes, les pastilles suivent.
+     */
+    stats: [
+      {
+        value: "+80",
+        unit: "clients",
+        caption: "Accompagnés depuis la création du studio.",
+      },
+      {
+        value: "5",
+        unit: "semaines",
+        caption: "Délai moyen entre le cadrage et la mise en ligne.",
+      },
+      {
+        value: "100",
+        unit: "%",
+        caption: "Des projets suivis personnellement par le fondateur.",
+      },
+    ],
+  },
+
   /* ------------------------------------------------------------- SERVICES */
   services: {
     eyebrow: "Services",
@@ -264,8 +302,8 @@ export const site = {
       "[À REMPLIR — présente le studio : qui tu es, depuis quand, pour qui tu travailles. Deux ou trois phrases suffisent, écrites simplement.]",
       "[À REMPLIR — ta manière de travailler et ce qui te distingue : proximité, délais, expertise technique, accompagnement dans la durée…]",
     ],
-    /** Photo du fondateur / de l'équipe, dans /public (ex. "/studio/portrait.jpg"). */
-    image: null as string | null,
+    /* La photo du fondateur / de l'équipe se dépose depuis l'administration
+       (Paramètres → CMS). */
     signature: {
       name: "Franck TCHETEHO",
       role: "Fondateur, New Wave Conception",

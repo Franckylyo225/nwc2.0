@@ -5,16 +5,17 @@ import { Eyebrow, Section } from "./ui";
 
 const { about, brand } = site;
 
-export function About() {
+/** `image` vient des réglages (Paramètres → CMS) ; sans elle, un repli dégradé. */
+export function About({ image }: { image: string | null }) {
   return (
     <Section id="studio">
       <div className="grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
         {/* Portrait / visuel */}
         <Reveal className="order-2 lg:order-1">
           <div className="relative aspect-4/5 overflow-hidden rounded-card bg-gradient-to-br from-accent/20 via-surface-2 to-surface ring-1 ring-line">
-            {about.image ? (
+            {image ? (
               <Image
-                src={about.image}
+                src={image}
                 alt={about.signature.name}
                 fill
                 sizes="(max-width: 1024px) 100vw, 45vw"
@@ -27,8 +28,8 @@ export function About() {
                     {brand.short}
                   </span>
                   <span className="mt-4 block text-sm text-muted">
-                    Ajoute ta photo dans <code>/public</code> puis renseigne{" "}
-                    <code>about.image</code>
+                    Dépose la photo depuis l&apos;administration,{" "}
+                    <span className="whitespace-nowrap">Paramètres → CMS</span>
                   </span>
                 </div>
               </div>

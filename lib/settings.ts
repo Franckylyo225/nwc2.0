@@ -23,6 +23,16 @@ export type SiteSettings = {
    * se gèrent depuis l'administration.
    */
   heroImages: Record<number, string | null>;
+  /**
+   * Visuels des blocs du site, gérés depuis l'onglet « CMS » des paramètres.
+   * Vides, chaque bloc affiche son repli dégradé sans décaler la mise en page.
+   */
+  blockImages: {
+    /** Fond de la carte de présentation, avant les services. */
+    aboutBanner: string | null;
+    /** Photo de la section « Le studio ». */
+    aboutStudio: string | null;
+  };
 };
 
 /**
@@ -41,6 +51,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   maintenanceEtaIsFuture: false,
   showContact: true,
   heroImages: { 1: null, 2: null, 3: null },
+  blockImages: { aboutBanner: null, aboutStudio: null },
 };
 
 export async function getSettings(): Promise<SiteSettings> {
@@ -62,6 +73,10 @@ export async function getSettings(): Promise<SiteSettings> {
       1: row.heroImage1,
       2: row.heroImage2,
       3: row.heroImage3,
+    },
+    blockImages: {
+      aboutBanner: row.aboutBannerImage,
+      aboutStudio: row.aboutStudioImage,
     },
   };
 }

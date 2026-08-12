@@ -123,7 +123,22 @@ export const settingsSchema = z.object({
   heroImage1: optionalText,
   heroImage2: optionalText,
   heroImage3: optionalText,
+  aboutBannerImage: optionalText,
+  aboutStudioImage: optionalText,
 });
+
+/**
+ * Champs image des réglages. Une seule liste, parcourue par `saveSettings`
+ * pour traiter les envois de fichiers : ajouter une image au site se résume
+ * donc à compléter le schéma ci-dessus et cette liste.
+ */
+export const SETTINGS_IMAGE_FIELDS = [
+  "heroImage1",
+  "heroImage2",
+  "heroImage3",
+  "aboutBannerImage",
+  "aboutStudioImage",
+] as const;
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."),

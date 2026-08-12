@@ -91,8 +91,9 @@ publier/dépublier, supprimer :
 | Actualités & blog | `/blog` et les 3 dernières nouvelles sur l'accueil |
 | Témoignages | Le carrousel de citations |
 
-Plus une page **Paramètres**, décrite ci-dessous : mode maintenance et images
-du titre d'accueil.
+Plus une page **Paramètres**, en trois onglets, décrits ci-dessous : mode
+maintenance, images du titre d'accueil, et **CMS** — les visuels des blocs de
+la page d'accueil.
 
 Points communs à tous les contenus :
 
@@ -121,6 +122,27 @@ place : la mise en page ne bouge pas au moment de la remplacer.
 Format conseillé : carré, 400 × 400 px minimum, sujet centré — l'image est
 recadrée en cercle. Sa taille est exprimée en `em`, elle suit donc l'échelle du
 titre à tous les points de rupture.
+
+### CMS — les visuels des blocs
+
+Le troisième onglet des paramètres gère les photos des blocs de l'accueil :
+
+| Visuel | Bloc alimenté | Format conseillé |
+| --- | --- | --- |
+| Fond de la carte de présentation | La grande carte sombre, avant les services | Paysage large, 2000 × 900 px |
+| Photo de la section « Le studio » | Le portrait à côté du texte de présentation | Portrait, 1000 × 1250 px |
+
+Même principe que les vignettes du titre : **la mise en page vit dans le code,
+les images en base**. Aucun chemin d'image ne se saisit dans `content/site.ts`.
+
+Chaque bloc fonctionne sans image — un dégradé occupe alors exactement la même
+place, donc rien ne bouge au moment d'en ajouter une. Vider le champ remet le
+dégradé.
+
+Pour brancher un visuel de plus : une colonne dans `SiteSettings`, une entrée
+dans `settingsSchema` et `SETTINGS_IMAGE_FIELDS` (`lib/schemas.ts`), une ligne
+dans `BLOCK_IMAGES` (`SettingsForm.tsx`), et le composant reçoit son image en
+prop depuis `app/(site)/page.tsx`.
 
 ### Mode maintenance
 
@@ -158,14 +180,58 @@ vers une variable d'environnement lisible par le middleware.
   où Prisma n'est pas disponible).
 - `/admin` est exclu de l'indexation par les moteurs de recherche.
 
+## Pages légales
+
+Les trois documents référencés dans le pied de page — `/mentions-legales`,
+`/confidentialite` et `/cgv` — vivent dans
+[`content/legal.ts`](content/legal.ts), en Markdown, et se rendent côté serveur
+comme les articles du blog. Les coordonnées sont lues depuis `content/site.ts` :
+un changement d'adresse ou d'e-mail se propage tout seul.
+
+**Le cadre retenu est celui d'une société de droit ivoirien** établie à Abidjan
+et démarchant aussi des clients en France. Deux régimes se superposent donc, et
+les textes le disent : la loi ivoirienne n°2013-450 sous le contrôle de l'ARTCI,
+et le RGPD, applicable par extraterritorialité dès lors que le studio propose
+ses services à des personnes situées dans l'Union.
+
+⚠️ **Ces pages ne sont pas publiables en l'état.** Elles contiennent des
+`[À REMPLIR]` qui, ici, ne sont pas des imperfections : une mention légale
+incomplète est une infraction. Il manque notamment la forme juridique, le
+capital, le RCCM, le compte contribuable, le directeur de la publication, et
+les échéances de paiement des CGV.
+
+```bash
+grep -rn "À REMPLIR" content/legal.ts
+```
+
+Une fois complétées, **fais-les relire par un juriste**. Ce sont des documents
+qui engagent la société ; le travail fourni ici est une base sérieuse et
+documentée, pas un avis juridique.
+
+Deux choix à connaître :
+
+- **Elles échappent au mode maintenance.** Les routes sont dans `app/(legal)/`,
+  hors du groupe `(site)`. Un client qui suit le lien vers les CGV depuis un
+  devis, ou un visiteur qui cherche à identifier l'éditeur, ne doit pas tomber
+  sur la page d'attente. Elles ne lisent rien en base, donc rien ne justifiait
+  de les fermer avec le reste du site — et elles restent prégénérées en
+  statique.
+- **Elles sont en `noindex, follow`.** Accessibles et citables, mais absentes
+  des résultats de recherche, où elles ne feraient que diluer le site.
+
+Pour ajouter un quatrième document, ajoute-le à `legalDocuments` dans
+`content/legal.ts`, crée `app/(legal)/<slug>/page.tsx` sur le modèle des trois
+autres, et référence-le dans `site.footer`.
+
 ## Modifier les textes
 
-Le contenu se répartit en deux endroits :
+Le contenu se répartit en trois endroits :
 
 - **L'administration `/admin`** gère les contenus qui bougent : services,
   réalisations, projets maison, actualités, blog, témoignages.
 - **[`content/site.ts`](content/site.ts)** garde les textes fixes : hero, titres
   de section, méthode, FAQ, coordonnées, logos partenaires.
+- **[`content/legal.ts`](content/legal.ts)** porte les trois pages légales.
 
 Aucun texte n'est écrit en dur dans les composants.
 
@@ -177,20 +243,47 @@ grep -rn "À REMPLIR" content/
 ```
 
 Il en reste dans : le badge de disponibilité, la présentation du studio, deux
-réponses de la FAQ, et les coordonnées. Les réalisations, projets maison et
-témoignages se remplissent désormais depuis l'administration.
+réponses de la FAQ, les coordonnées, et les trois pages légales. Les
+réalisations, projets maison et témoignages se remplissent désormais depuis
+l'administration.
 
 ## Ajouter des images
 
 Le site fonctionne sans aucune image : les projets et le portrait affichent des
 visuels dégradés en attendant. Pour mettre les vraies :
 
-1. Dépose le fichier dans `public/` (ex. `public/works/mon-projet.jpg`).
-2. Renseigne le chemin dans `content/site.ts` :
-   - `works.items[].image` → `"/works/mon-projet.jpg"`
-   - `about.image` → `"/studio/portrait.jpg"`
+**Presque toutes les images se déposent depuis l'administration** — réalisations
+et projets maison depuis leur fiche, visuels des blocs d'accueil depuis
+[Paramètres → CMS](#cms--les-visuels-des-blocs). Rien à écrire dans le code.
 
-Format conseillé : 1600 × 1000 px pour les projets, 1000 × 1250 px pour le portrait.
+Reste `content/site.ts` pour les seuls visuels figés du dépôt :
+
+1. Dépose le fichier dans `public/` (ex. `public/partners/mon-client.png`).
+2. Renseigne le chemin dans `trustedBy.logos`.
+
+### Le bandeau de présentation
+
+La grande carte sombre placée juste avant les services vit dans
+[`components/AboutBanner.tsx`](components/AboutBanner.tsx), son texte et ses
+chiffres dans `aboutBanner` (`content/site.ts`).
+
+À distinguer de la section `about` (`#studio`) plus bas : le bandeau pose
+l'ambition en deux phrases, la section raconte le studio en détail.
+
+**La photo de fond est facultative** et se dépose depuis
+[Paramètres → CMS](#cms--les-visuels-des-blocs). Sans elle, la carte reste
+sombre et lisible — le dégradé occupe exactement la même place, donc la mise en
+page ne bouge pas au moment de la remplacer.
+
+Les chiffres de la carte flottante défilent horizontalement, **sans une ligne
+de JavaScript** : une zone à défilement avec accroche, et un curseur de
+pastilles piloté par le défilement lui-même (`.stat-carousel` dans
+`app/globals.css`). Ajoute ou retire une entrée de `aboutBanner.stats`, les
+pastilles suivent.
+
+Sur les navigateurs sans *scroll-driven animations* (Firefox), le curseur reste
+sur la première pastille — l'état initial du carrousel, donc un affichage juste
+— et le défilement fonctionne normalement.
 
 ### Logos partenaires
 
@@ -223,9 +316,12 @@ auto-hébergées — aucun appel à Google Fonts depuis le navigateur.
 ```
 app/
   layout.tsx           polices, métadonnées SEO
-  page.tsx             accueil — charge les contenus et assemble les sections
   globals.css          design system (couleurs, typo, animations, corps d'article)
-  blog/                liste et pages d'articles
+  (site)/
+    layout.tsx         portail public — applique le mode maintenance
+    page.tsx           accueil — charge les contenus et assemble les sections
+    blog/              liste et pages d'articles
+  (legal)/             mentions légales, confidentialité, CGV
   admin/
     actions.ts         toutes les Server Actions (CRUD + connexion)
     connexion/         page de connexion
@@ -234,12 +330,15 @@ app/
 components/
   ui.tsx               boutons, en-têtes de section, icônes
   Reveal.tsx           apparition au défilement
+  AboutBanner.tsx      grande carte sombre de présentation, avant les services
+  LegalPage.tsx        gabarit commun aux trois pages légales
   admin/               coquille, formulaire générique, actions de ligne
   Nav.tsx  Hero.tsx  TrustedBy.tsx  Services.tsx  Works.tsx
   Testimonials.tsx  About.tsx  Process.tsx  Products.tsx
   LatestArticles.tsx  Faq.tsx  Cta.tsx  Footer.tsx
 content/
   site.ts              textes fixes du site
+  legal.ts             mentions légales, confidentialité, CGV (Markdown)
 lib/
   db.ts                client Prisma
   content.ts           lecture des contenus (base, ou repli statique)
@@ -421,9 +520,9 @@ npm run db:seed
 Avant de publier, pense à :
 
 - remplacer tous les `[À REMPLIR]` restants ;
-- renseigner `brand.url` dans `content/site.ts` (balises SEO) ;
 - déclarer `DATABASE_URL`, `ADMIN_EMAIL`, `ADMIN_PASSWORD` et
   `BLOB_READ_WRITE_TOKEN` dans les variables d'environnement Vercel, puis
   lancer `npm run db:deploy` et `npm run db:seed` une fois ;
-- créer les pages `/mentions-legales`, `/confidentialite` et `/cgv`,
-  référencées dans le pied de page — obligatoire en France.
+- compléter les `[À REMPLIR]` des [pages légales](#pages-légales) — RCCM,
+  forme juridique, capital, directeur de la publication, échéances de paiement
+  — et les faire relire par un juriste.

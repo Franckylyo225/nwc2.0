@@ -31,9 +31,31 @@ const HERO_SLOTS = [
   },
 ] as const;
 
+/**
+ * Visuels des blocs du site. L'ordre est celui de la page d'accueil.
+ *
+ * Pour en ajouter un : une colonne dans `SiteSettings`, une entrée dans
+ * `settingsSchema` et `SETTINGS_IMAGE_FIELDS`, puis une ligne ici.
+ */
+const BLOCK_IMAGES = [
+  {
+    name: "aboutBannerImage",
+    key: "aboutBanner",
+    label: "Fond de la carte de présentation",
+    help: "La grande carte sombre placée juste avant les services. Format paysage très large, 2000 × 900 px environ. Le texte se pose par-dessus : choisis une image calme, sans détail important en bas à gauche.",
+  },
+  {
+    name: "aboutStudioImage",
+    key: "aboutStudio",
+    label: "Photo de la section « Le studio »",
+    help: "Le portrait ou la photo d'équipe affiché à côté du texte de présentation. Format portrait, 1000 × 1250 px environ.",
+  },
+] as const;
+
 const TABS = [
   { id: "maintenance", label: "Mode maintenance" },
   { id: "hero", label: "Images du titre" },
+  { id: "cms", label: "CMS" },
 ] as const;
 
 type TabId = (typeof TABS)[number]["id"];
@@ -249,6 +271,37 @@ export function SettingsForm({
               name={slot.name}
               value={settings.heroImages[slot.position] ?? ""}
               help={slot.help}
+              mode={storage}
+            />
+          </div>
+        ))}
+      </div>
+
+      {/* ------------------------------------------------ Onglet 3 : CMS */}
+      <div
+        role="tabpanel"
+        id="panel-cms"
+        aria-labelledby="tab-cms"
+        hidden={tab !== "cms"}
+        className="flex flex-col gap-6"
+      >
+        <p className="text-sm leading-relaxed text-muted">
+          Les visuels des blocs de la page d&apos;accueil. Chaque bloc
+          fonctionne sans image : un dégradé occupe alors exactement la même
+          place, donc <strong>la mise en page ne bouge pas</strong> au moment
+          d&apos;en ajouter une. Vider le champ remet le dégradé.
+        </p>
+
+        {BLOCK_IMAGES.map((block) => (
+          <div key={block.name} className="flex flex-col gap-2">
+            <label htmlFor={block.name} className="text-sm font-medium text-ink">
+              {block.label}
+            </label>
+            <ImageField
+              id={block.name}
+              name={block.name}
+              value={settings.blockImages[block.key] ?? ""}
+              help={block.help}
               mode={storage}
             />
           </div>
