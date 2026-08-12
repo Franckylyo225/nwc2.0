@@ -299,6 +299,30 @@
   margin-block: 2.5em;
 }
 
+/* Un tableau ne se comprime pas sous 320 px : on le laisse défiler dans son
+   propre conteneur plutôt que d'élargir la page entière. */
+.prose-nwc table {
+  display: block;
+  overflow-x: auto;
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.9375rem;
+}
+
+.prose-nwc th,
+.prose-nwc td {
+  border-bottom: 1px solid var(--color-line);
+  padding: 0.7em 1em 0.7em 0;
+  text-align: left;
+  vertical-align: top;
+}
+
+.prose-nwc th {
+  color: var(--color-ink);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
 /** Grille de fond très discrète. */
 @utility grid-bg {
   background-image:
