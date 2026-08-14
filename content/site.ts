@@ -71,9 +71,10 @@ export const site = {
         text: "des plus grandes",
         imageSlot: 2,
       },
-      { text: "marques" },
+      { text: "marques", accent: true },
       {
         text: "d'Abidjan",
+        accent: true,
         imageSlot: 3,
       },
       { text: "et d'ailleurs." },
