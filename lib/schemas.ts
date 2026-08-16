@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { site } from "@/content/site";
 
 /**
  * Schémas de validation partagés entre les formulaires admin et les actions
@@ -17,6 +18,29 @@ const optionalText = z
   .trim()
   .transform((value) => (value === "" ? null : value))
   .nullable();
+
+/**
+ * Facultatif mais borné. À préférer à `optionalText` partout où la saisie
+ * vient du public : sans plafond, un champ laissé libre accepte un mégaoctet.
+ */
+const optionalBounded = (label: string, max: number) =>
+  z
+    .string()
+    .trim()
+    .max(max, `${label} dépasse ${max} caractères.`)
+    .transform((value) => (value === "" ? null : value))
+    .nullable();
+
+/** Facultatif, et limité aux choix proposés par le formulaire. */
+const optionalChoice = (label: string, choices: readonly string[]) =>
+  z
+    .string()
+    .trim()
+    .transform((value) => (value === "" ? null : value))
+    .nullable()
+    .refine((value) => value === null || choices.includes(value), {
+      message: `${label} ne fait pas partie des choix proposés.`,
+    });
 
 /** Découpe une saisie « un élément par ligne » en tableau. */
 export const linesToArray = z
@@ -140,10 +164,61 @@ export const SETTINGS_IMAGE_FIELDS = [
   "aboutStudioImage",
 ] as const;
 
+/**
+ * Message du formulaire de contact public.
+ *
+ * Seul schéma dont les données viennent d'un inconnu : chaque champ est borné,
+ * et les deux listes déroulantes n'acceptent que les choix de content/site.ts.
+ * Le corps exige quelques mots — « ok » n'est pas une demande, et c'est ce que
+ * postent les robots qui passent les autres filtres.
+ */
+export const messageSchema = z.object({
+  name: text("Le nom", 120),
+  email: z
+    .string()
+    .trim()
+    .toLowerCase()
+    .max(200, "L'adresse e-mail dépasse 200 caractères.")
+    .email("Adresse e-mail invalide."),
+  phone: optionalBounded("Le téléphone", 40),
+  company: optionalBounded("L'entreprise", 120),
+  projectType: optionalChoice("Le type de projet", site.contact.form.projectTypes),
+  budget: optionalChoice("Le budget", site.contact.form.budgets),
+  body: z
+    .string()
+    .trim()
+    .min(20, "Décrivez votre projet en quelques mots (20 caractères minimum).")
+    .max(5000, "Le message dépasse 5000 caractères."),
+});
+
+/**
+ * Noms des deux champs pièges du formulaire de contact. Ils sont posés par le
+ * composant et relus par l'action serveur : la constante évite qu'un renommage
+ * d'un côté désarme silencieusement le piège de l'autre.
+ *
+ * Le leurre est invisible à l'écran mais présent dans le HTML — un robot qui
+ * remplit tout le formulaire le remplit aussi, un visiteur non. Son nom
+ * compte : les robots visent les champs qui ressemblent à des vrais.
+ */
+export const HONEYPOT_FIELD = "site-web";
+
+/** Horodatage d'affichage du formulaire, posé par le navigateur. */
+export const RENDERED_AT_FIELD = "affiche-a";
+
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."),
   password: z.string().min(1, "Le mot de passe est obligatoire."),
 });
+
+/** Met à plat les erreurs zod en un objet champ → message. */
+export function fieldErrorsOf(error: z.ZodError): Record<string, string> {
+  const result: Record<string, string> = {};
+  for (const issue of error.issues) {
+    const key = String(issue.path[0] ?? "_");
+    result[key] ??= issue.message;
+  }
+  return result;
+}
 
 /** Fabrique un slug lisible à partir d'un titre. */
 export function slugify(input: string) {

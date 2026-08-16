@@ -5,9 +5,11 @@ import { redirect } from "next/navigation";
 import type { z } from "zod";
 import { createSession, destroySession, requireUser, verifyPassword } from "@/lib/auth";
 import { prisma } from "@/lib/db";
+import type { MessageStatus } from "@/lib/generated/prisma";
 import {
   SETTINGS_IMAGE_FIELDS,
   articleSchema,
+  fieldErrorsOf,
   loginSchema,
   settingsSchema,
   productSchema,
@@ -116,6 +118,48 @@ export async function saveSettings(
   return { ok: true };
 }
 
+/* -------------------------------------------------------------- Messages --- */
+
+/**
+ * Les messages reçus ne passent pas par la fabrique ci-dessous : ils ne se
+ * publient pas, ne s'ordonnent pas, et ne se créent pas depuis l'admin. Ils
+ * ne se lisent, ne se rangent et ne se suppriment — et aucune page publique
+ * n'a besoin d'être rafraîchie.
+ */
+export async function setMessageStatus(
+  id: string,
+  status: MessageStatus,
+): Promise<ActionState> {
+  await requireUser();
+
+  try {
+    await prisma.message.update({ where: { id }, data: { status } });
+  } catch (error) {
+    return toMessage(error);
+  }
+
+  revalidateInbox();
+  return {};
+}
+
+export async function removeMessage(id: string): Promise<ActionState> {
+  await requireUser();
+
+  try {
+    await prisma.message.delete({ where: { id } });
+  } catch (error) {
+    return toMessage(error);
+  }
+
+  revalidateInbox();
+  return {};
+}
+
+/** La pastille des non-lus vit dans le menu, donc dans le layout de l'admin. */
+function revalidateInbox() {
+  revalidatePath("/admin", "layout");
+}
+
 /* ------------------------------------------------------------- Fabrique --- */
 
 /** Chemins publics à rafraîchir après une écriture. */
@@ -150,16 +194,6 @@ function toMessage(error: unknown): ActionState {
     };
   }
   return { error: message };
-}
-
-/** Met à plat les erreurs zod en un objet champ → message. */
-function fieldErrorsOf(error: z.ZodError): Record<string, string> {
-  const result: Record<string, string> = {};
-  for (const issue of error.issues) {
-    const key = String(issue.path[0] ?? "_");
-    result[key] ??= issue.message;
-  }
-  return result;
 }
 
 /**

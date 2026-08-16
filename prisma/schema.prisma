@@ -53,6 +53,12 @@ model SiteSettings {
   /// Portrait ou photo d'équipe de la section « Le studio ».
   aboutStudioImage   String?
 
+  /// Sel du hachage des expéditeurs du formulaire de contact (voir Message).
+  /// Tiré au sort à la première réception et jamais réaffiché : il vit ici
+  /// plutôt que dans une variable d'environnement pour qu'aucune installation
+  /// ne se retrouve à hacher sans sel, faute de l'avoir configurée.
+  contactSalt        String?
+
   updatedAt          DateTime  @updatedAt
 }
 
@@ -175,4 +181,38 @@ model Testimonial {
   updatedAt DateTime @updatedAt
 
   @@index([published, position])
+}
+
+/// Messages reçus par le formulaire de contact.
+///
+/// Seul modèle alimenté depuis l'extérieur : il n'a donc ni `position` ni
+/// `published` — rien ici ne s'affiche sur le site — mais un statut de
+/// traitement, qui fait de la boîte de réception une vraie liste de tâches.
+model Message {
+  id          String        @id @default(cuid())
+  name        String
+  email       String
+  phone       String?
+  company     String?
+  /// Type de projet et budget : deux chaînes libres, remplies par le visiteur
+  /// à partir des choix de content/site.ts. Stockées telles quelles pour que
+  /// modifier ces choix plus tard ne réécrive pas l'historique.
+  projectType String?
+  budget      String?
+  body        String
+  status      MessageStatus @default(NEW)
+  /// Empreinte salée de l'adresse IP — jamais l'adresse elle-même. Elle ne
+  /// sert qu'à repérer les envois en rafale ; sans le sel, qui vit en base,
+  /// elle ne se remonte pas.
+  senderHash  String
+  createdAt   DateTime      @default(now())
+
+  @@index([status, createdAt])
+  @@index([senderHash, createdAt])
+}
+
+enum MessageStatus {
+  NEW /// Reçu, pas encore lu
+  READ /// Lu, en cours de traitement
+  ARCHIVED /// Traité, rangé
 }

@@ -1,6 +1,6 @@
 import { About } from "@/components/About";
 import { AboutBanner } from "@/components/AboutBanner";
-import { Cta } from "@/components/Cta";
+import { Contact } from "@/components/Contact";
 import { Faq } from "@/components/Faq";
 import { Footer } from "@/components/Footer";
 import { Hero } from "@/components/Hero";
@@ -55,7 +55,7 @@ export default async function Home() {
         <Products items={products} />
         <LatestArticles items={articles} />
         <Faq />
-        <Cta />
+        <Contact />
       </main>
       <Footer />
     </>

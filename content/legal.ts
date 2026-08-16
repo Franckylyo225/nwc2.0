@@ -38,7 +38,7 @@ export type LegalDocument = {
 };
 
 /** Dernière révision des trois documents. À bouger à chaque modification de fond. */
-const UPDATED_AT = "2026-08-11";
+const UPDATED_AT = "2026-08-16";
 
 const { brand, contact } = site;
 
@@ -126,7 +126,7 @@ const confidentialite: LegalDocument = {
   slug: "confidentialite",
   title: "Politique de confidentialité",
   description:
-    "Ce site public ne dépose aucun cookie, n'utilise aucun outil de mesure d'audience et n'héberge aucun formulaire. Voici, en détail, ce que nous traitons et ce que nous ne traitons pas.",
+    "Ce site public ne dépose aucun cookie et n'utilise aucun outil de mesure d'audience. Voici, en détail, ce que nous traitons et ce que nous ne traitons pas.",
   updatedAt: UPDATED_AT,
   body: `
 ## En résumé
@@ -136,7 +136,7 @@ Ce site est volontairement sobre. À sa consultation :
 - **aucun cookie n'est déposé** sur votre navigateur ;
 - **aucun outil de mesure d'audience** n'est installé — ni Google Analytics, ni équivalent ;
 - **aucun script tiers**, aucun bouton de réseau social, aucune police chargée depuis un serveur extérieur ;
-- **aucun formulaire** : nous contacter suppose de nous écrire vous-même, par courriel ou par téléphone.
+- **un seul formulaire**, celui de contact, et il ne se remplit qu'à votre initiative.
 
 Autrement dit, tant que vous ne nous écrivez pas, nous ne détenons sur vous que ce que tout serveur web enregistre techniquement pour fonctionner.
 
@@ -157,13 +157,27 @@ Deux régimes se superposent, et nous appliquons le plus protecteur des deux à 
 
 ### 3.1 Lorsque vous nous écrivez
 
-Si vous nous contactez par courriel ou par téléphone, nous traitons les données que vous nous transmettez de vous-même : nom, adresse électronique, numéro de téléphone, nom de votre organisation, et le contenu de votre message.
+Si vous nous contactez par le **formulaire du site**, par courriel ou par téléphone, nous traitons les données que vous nous transmettez de vous-même : nom, adresse électronique, numéro de téléphone, nom de votre organisation, type de projet et budget envisagés, et le contenu de votre message.
+
+Les seuls champs obligatoires du formulaire sont le nom, l'adresse électronique et le message ; les autres restent à votre appréciation.
 
 - **Finalité** : répondre à votre demande, établir un devis, assurer le suivi de la relation commerciale.
 - **Base légale** : votre démarche elle-même — mesures précontractuelles prises à votre demande, puis exécution du contrat s'il est conclu (art. 6.1.b du RGPD).
 - **Durée de conservation** : trois ans à compter du dernier échange en l'absence de contrat ; pour les clients, la durée de la relation commerciale, prolongée des délais légaux de conservation des documents comptables.
 
-### 3.2 Journaux techniques du serveur
+Les messages envoyés par le formulaire sont enregistrés dans notre base de données et consultés depuis notre espace d'administration. Ils ne sont transmis à aucun outil tiers de gestion commerciale.
+
+### 3.2 Protection du formulaire contre les envois automatisés
+
+Pour empêcher qu'un programme n'inonde le formulaire, nous enregistrons auprès de chaque message une **empreinte de votre adresse IP** et non l'adresse elle-même : celle-ci est combinée à une valeur secrète propre à notre installation, puis transformée par une fonction de hachage irréversible.
+
+- **Finalité** : limiter le nombre de messages envoyés depuis une même connexion.
+- **Base légale** : notre intérêt légitime à préserver le bon fonctionnement du formulaire (art. 6.1.f du RGPD).
+- **Durée de conservation** : celle du message auquel l'empreinte est attachée.
+
+Cette empreinte ne permet ni de retrouver votre adresse, ni de vous suivre d'un site à l'autre. Elle n'est utilisée à aucune autre fin, et notamment pas à des fins statistiques ou commerciales.
+
+### 3.3 Journaux techniques du serveur
 
 Comme tout serveur web, notre hébergeur enregistre automatiquement, à chaque requête, l'adresse IP appelante, la date et l'heure, la page demandée, le type de navigateur et le référent.
 
@@ -171,7 +185,7 @@ Comme tout serveur web, notre hébergeur enregistre automatiquement, à chaque r
 - **Base légale** : notre intérêt légitime à assurer la sécurité et la disponibilité du site (art. 6.1.f du RGPD).
 - **Durée de conservation** : celle pratiquée par notre hébergeur, de l'ordre de quelques semaines. Nous n'exploitons pas ces journaux à des fins statistiques ou commerciales.
 
-### 3.3 Cookie d'administration
+### 3.4 Cookie d'administration
 
 Un unique cookie, nommé \`nwc_session\`, est déposé **à la connexion à l'espace d'administration** — donc uniquement pour les membres du studio, jamais pour un visiteur.
 
@@ -179,7 +193,7 @@ Il est strictement nécessaire à l'authentification, ne contient qu'un identifi
 
 Aucun autre cookie n'existe sur ce site — d'où l'absence de bandeau : il n'y aurait rien à vous demander.
 
-### 3.4 Ce que nous ne faisons pas
+### 3.5 Ce que nous ne faisons pas
 
 Nous ne vendons, ne louons ni n'échangeons vos données. Nous ne construisons pas de profils publicitaires. Nous ne pratiquons aucune décision automatisée produisant des effets juridiques à votre égard.
 

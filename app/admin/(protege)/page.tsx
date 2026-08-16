@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ADMIN_SECTIONS, PageHeader } from "@/components/admin/shell";
+import { ADMIN_INBOX, ADMIN_SECTIONS, PageHeader } from "@/components/admin/shell";
 import { prisma } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 import { storageMode } from "@/lib/upload";
@@ -27,8 +27,21 @@ async function countPair(total: () => Promise<number>, drafts: () => Promise<num
   return { total: a, drafts: b };
 }
 
+/** Boîte de réception : ce qui reste à traiter, et ce qui n'a pas été ouvert. */
+async function getInbox() {
+  const [toHandle, unread] = await Promise.all([
+    prisma.message.count({ where: { status: { in: ["NEW", "READ"] } } }),
+    prisma.message.count({ where: { status: "NEW" } }),
+  ]);
+  return { toHandle, unread };
+}
+
 export default async function AdminHome() {
-  const [counts, settings] = await Promise.all([getCounts(), getSettings()]);
+  const [counts, inbox, settings] = await Promise.all([
+    getCounts(),
+    getInbox(),
+    getSettings(),
+  ]);
 
   const cards = [
     { ...ADMIN_SECTIONS[0], ...counts.services },
@@ -59,6 +72,27 @@ export default async function AdminHome() {
           </Link>
         </p>
       ) : null}
+
+      <Link
+        href={ADMIN_INBOX.href}
+        className="mb-8 flex flex-col gap-2 rounded-card bg-ink px-6 py-6 text-white transition-shadow duration-300 ease-smooth hover:shadow-[0_20px_50px_-25px_rgba(16,17,20,0.6)] sm:flex-row sm:items-center sm:justify-between"
+      >
+        <span>
+          <span className="text-sm font-medium">Messages reçus</span>
+          <span className="mt-1 block text-sm text-white/55">
+            {inbox.toHandle === 0
+              ? "Rien à traiter pour l'instant."
+              : inbox.unread > 0
+                ? `${inbox.unread} non ${inbox.unread > 1 ? "lus" : "lu"} sur ${inbox.toHandle} à traiter.`
+                : `${inbox.toHandle} en attente de réponse.`}
+          </span>
+        </span>
+        <span
+          className={`display text-4xl ${inbox.unread > 0 ? "text-accent" : "text-white/70"}`}
+        >
+          {inbox.toHandle}
+        </span>
+      </Link>
 
       <ul className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {cards.map((card) => (

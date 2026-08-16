@@ -80,8 +80,8 @@ relève l'autre.
 
 ## L'administration
 
-Cinq rubriques, toutes sur le même fonctionnement — lister, créer, modifier,
-publier/dépublier, supprimer :
+Cinq rubriques de contenu, toutes sur le même fonctionnement — lister, créer,
+modifier, publier/dépublier, supprimer :
 
 | Rubrique | Ce qu'elle alimente |
 | --- | --- |
@@ -91,9 +91,10 @@ publier/dépublier, supprimer :
 | Actualités & blog | `/blog` et les 3 dernières nouvelles sur l'accueil |
 | Témoignages | Le carrousel de citations |
 
-Plus une page **Paramètres**, en trois onglets, décrits ci-dessous : mode
-maintenance, images du titre d'accueil, et **CMS** — les visuels des blocs de
-la page d'accueil.
+Plus **[Messages](#le-formulaire-de-contact)**, qui ne s'alimente pas depuis
+l'admin mais depuis le site, et une page **Paramètres** en trois onglets,
+décrits ci-dessous : mode maintenance, images du titre d'accueil, et **CMS** —
+les visuels des blocs de la page d'accueil.
 
 Points communs à tous les contenus :
 
@@ -108,6 +109,57 @@ Le contenu des articles s'écrit en **Markdown** (`## titre`, `**gras**`,
 `- liste`, `[lien](url)`), rendu en HTML côté serveur.
 
 Toute publication rafraîchit immédiatement les pages publiques concernées.
+
+### Le formulaire de contact
+
+La section `#contact`, en bas de la page d'accueil, porte un vrai formulaire.
+Les demandes arrivent dans **`/admin/messages`** — une pastille dans le menu
+compte les non-lues.
+
+**Rien ne part par e-mail.** C'est délibéré : envoyer du courrier depuis le
+site demanderait un service tiers et une clé d'API, donc une configuration de
+plus à maintenir et à surveiller. Le jour où l'attente d'une notification se
+fait sentir, c'est l'ajout à faire — jusque-là, la boîte de réception de
+l'administration suffit et ne peut pas tomber en panne toute seule.
+
+Un message se lit, se range (*Archiver*) ou se supprime. L'ouvrir le marque lu.
+Le bouton **Répondre par e-mail** ouvre votre logiciel de courrier avec le
+destinataire, l'objet et la salutation déjà remplis : la réponse part de la
+vraie boîte du studio, pas du site.
+
+Les champs proposés (*type de projet*, *budget*) se règlent dans
+`contact.form` de `content/site.ts`. Ces listes servent **aussi à la
+validation** : une valeur hors liste est refusée. Les réponses sont
+enregistrées telles quelles, donc modifier les listes plus tard ne réécrit pas
+les messages déjà reçus.
+
+**Sans base de données**, le formulaire laisse place aux coordonnées directes —
+les messages n'auraient nulle part où atterrir.
+
+#### Ce qui filtre les robots
+
+Trois défenses, aucune ne demandant de clé d'API ni de service extérieur — le
+formulaire marche dès l'installation :
+
+| Filtre | Ce qu'il attrape |
+| --- | --- |
+| Champ leurre, invisible à l'écran | Les robots qui remplissent tout le formulaire |
+| Délai minimal de 3 s entre affichage et envoi | Ceux qui exécutent du JavaScript mais vont trop vite |
+| Quota de 3 messages par heure et 8 par jour | Le reste, y compris les envois en rafale |
+
+Un envoi rejeté par un piège reçoit la **même confirmation** qu'un envoi
+réussi : signaler l'échec ne ferait qu'aider à contourner le piège.
+
+Le quota s'appuie sur une **empreinte salée de l'adresse IP** — l'adresse
+elle-même n'est jamais enregistrée. Le sel est tiré au sort à la première
+réception et conservé en base (`SiteSettings.contactSalt`) : sans lui,
+l'empreinte d'une IPv4 se remonterait par force brute en quelques minutes.
+
+Le délai n'est vérifié que si le navigateur a posé l'horodatage. Sans
+JavaScript il est absent, et le test ne s'applique pas : refuser dans ce cas
+écarterait des visiteurs légitimes, alors que le quota, lui, rattrape les
+robots qui en profiteraient. Le formulaire fonctionne donc **sans JavaScript**,
+c'est une Server Action posée sur `action`.
 
 ### Images du titre d'accueil
 

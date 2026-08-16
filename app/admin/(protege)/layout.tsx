@@ -1,8 +1,12 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { ADMIN_SECTIONS, ADMIN_SETTINGS } from "@/components/admin/shell";
+import {
+  ADMIN_INBOX,
+  ADMIN_SECTIONS,
+  ADMIN_SETTINGS,
+} from "@/components/admin/shell";
 import { getCurrentUser } from "@/lib/auth";
-import { isDatabaseConfigured } from "@/lib/db";
+import { isDatabaseConfigured, prisma } from "@/lib/db";
 import { logout } from "../actions";
 
 /* La session doit être relue à chaque requête. */
@@ -21,6 +25,8 @@ export default async function ProtectedLayout({
   const user = await getCurrentUser();
   if (!user) redirect("/admin/connexion");
 
+  const unread = await prisma.message.count({ where: { status: "NEW" } });
+
   return (
     <div className="lg:grid lg:min-h-dvh lg:grid-cols-[16rem_1fr]">
       <aside className="border-b border-line bg-white lg:sticky lg:top-0 lg:h-dvh lg:border-b-0 lg:border-r">
@@ -34,6 +40,23 @@ export default async function ProtectedLayout({
 
           <nav className="flex-1">
             <ul className="flex flex-wrap gap-1 lg:flex-col">
+              <li className="lg:mb-2 lg:border-b lg:border-line lg:pb-2">
+                <Link
+                  href={ADMIN_INBOX.href}
+                  className="flex items-center gap-2 rounded-xl px-3 py-2 text-sm text-muted transition-colors hover:bg-surface hover:text-ink"
+                >
+                  {ADMIN_INBOX.label}
+                  {unread > 0 ? (
+                    <span className="inline-flex min-w-5 items-center justify-center rounded-pill bg-accent px-1.5 py-0.5 text-[0.65rem] font-medium text-white">
+                      {unread}
+                      <span className="sr-only">
+                        {unread > 1 ? " messages non lus" : " message non lu"}
+                      </span>
+                    </span>
+                  ) : null}
+                </Link>
+              </li>
+
               {ADMIN_SECTIONS.map((section) => (
                 <li key={section.href}>
                   <Link

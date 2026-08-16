@@ -2,6 +2,12 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { ArrowUpRight, cx } from "@/components/ui";
 
+/**
+ * Boîte de réception — à part, et en tête de menu : c'est la seule rubrique
+ * qui se remplit toute seule, donc la seule qui réclame d'être regardée.
+ */
+export const ADMIN_INBOX = { href: "/admin/messages", label: "Messages" } as const;
+
 /** Rubriques de l'admin — sert à la fois au menu et au tableau de bord. */
 export const ADMIN_SECTIONS = [
   { href: "/admin/services", label: "Services" },

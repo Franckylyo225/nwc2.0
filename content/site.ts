@@ -426,19 +426,21 @@ export const site = {
     ],
   },
 
-  /* ------------------------------------------------------- CTA & CONTACT */
-  cta: {
+  /* ------------------------------------------------------------- CONTACT */
+  contact: {
+    eyebrow: "Contact",
     title: "Un projet en tête ?",
     subtitle:
       "Racontez-nous en deux lignes ce que vous voulez construire. Réponse sous 24 h ouvrées, sans engagement.",
-    primary: { label: "Écrire au studio", href: "mailto:hello@nwc-agency.com" },
-    secondary: { label: "Réserver un appel", href: "[À REMPLIR — lien Calendly]" },
-  },
 
-  contact: {
     email: "hello@nwc-agency.com",
     phone: "+225 07 58 16 09 04",
     address: "Codody, Abidjan",
+    /** Rendez-vous en visio. Mets `null` pour masquer le lien. */
+    booking: {
+      label: "Réserver un appel de 20 minutes",
+      href: "[À REMPLIR — lien Calendly]",
+    },
     /** Retire les entrées que tu n'utilises pas. */
     socials: [
       { label: "LinkedIn", href: "[À REMPLIR — url LinkedIn]" },
@@ -446,6 +448,46 @@ export const site = {
       { label: "Behance", href: "[À REMPLIR — url Behance]" },
       { label: "Dribbble", href: "[À REMPLIR — url Dribbble]" },
     ],
+
+    /**
+     * Le formulaire lui-même. Les messages arrivent dans l'administration,
+     * rubrique « Messages » — rien n'est envoyé par e-mail pour l'instant.
+     *
+     * `projectTypes` et `budgets` alimentent les deux listes déroulantes ET la
+     * validation côté serveur : une valeur hors liste est refusée. Les
+     * réponses sont enregistrées telles quelles, donc modifier ces listes plus
+     * tard ne touche pas aux messages déjà reçus.
+     *
+     * Sans base de données configurée, le formulaire laisse place aux
+     * coordonnées directes : le site reste utile avant même la mise en place
+     * de la base.
+     */
+    form: {
+      title: "Parlez-nous de votre projet",
+      submit: "Envoyer le message",
+      /** Affiché à la place du formulaire une fois le message parti. */
+      successTitle: "Message bien reçu",
+      successBody:
+        "Merci — nous revenons vers vous sous 24 h ouvrées. En cas d'urgence, le téléphone reste le plus rapide.",
+      /** Mention sous le bouton. Le lien pointe vers la page de confidentialité. */
+      privacy:
+        "Vos coordonnées servent uniquement à répondre à votre demande.",
+      projectTypes: [
+        "Site vitrine",
+        "Boutique en ligne",
+        "Application ou plateforme web",
+        "Refonte d'un site existant",
+        "Identité de marque",
+        "Autre / je ne sais pas encore",
+      ],
+      budgets: [
+        "Moins de 500 000 FCFA",
+        "500 000 à 1 500 000 FCFA",
+        "1,5 à 3 millions FCFA",
+        "Plus de 3 millions FCFA",
+        "À définir ensemble",
+      ],
+    },
   },
 
   /* -------------------------------------------------------------- FOOTER */
