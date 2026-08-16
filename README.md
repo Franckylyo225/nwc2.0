@@ -86,7 +86,7 @@ modifier, publier/dépublier, supprimer :
 | Rubrique | Ce qu'elle alimente |
 | --- | --- |
 | Services | La grille de services de l'accueil |
-| Réalisations | Les projets clients |
+| Réalisations | Le carrousel de projets clients |
 | Projets maison | Vos SaaS et plateformes |
 | Actualités & blog | `/blog` et les 3 dernières nouvelles sur l'accueil |
 | Témoignages | Le carrousel de citations |
@@ -160,6 +160,25 @@ JavaScript il est absent, et le test ne s'applique pas : refuser dans ce cas
 écarterait des visiteurs légitimes, alors que le quota, lui, rattrape les
 robots qui en profiteraient. Le formulaire fonctionne donc **sans JavaScript**,
 c'est une Server Action posée sur `action`.
+
+### Le carrousel de réalisations
+
+Les projets clients ne s'empilent pas en liste : ils défilent **un par un, en
+grand**, sur fond sombre et pleine largeur — un projet se regarde, il ne se
+parcourt pas.
+
+Chaque fiche affiche le visuel en portrait au centre, le nom et le résumé à
+gauche, et à droite l'**année**, le **rôle** (champ *Rôle* de la fiche) et les
+**prestations** (une par ligne ; vide, la colonne disparaît).
+
+Le visuel du projet sert deux fois : net au centre, et agrandi/flouté en fond.
+Le décor change donc avec la fiche sans qu'aucune couleur soit à saisir dans
+l'administration. Sans visuel, un dégradé prend exactement la même place.
+
+La piste est une zone à défilement horizontal avec accroche : elle fonctionne
+**au doigt, au trackpad et au clavier sans JavaScript**. Les flèches et les
+pastilles sont un confort ajouté à l'hydratation — sans elles, on fait défiler
+à la main et rien n'est perdu.
 
 ### Images du titre d'accueil
 

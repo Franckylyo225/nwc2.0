@@ -40,9 +40,22 @@ export const workFields: Field[] = [
     label: "Slug",
     help: "Identifiant unique. Rempli automatiquement à partir du nom.",
   },
-  { type: "text", name: "category", label: "Catégorie", placeholder: "Site vitrine & identité" },
+  {
+    type: "text",
+    name: "category",
+    label: "Rôle",
+    placeholder: "Site vitrine & identité",
+    help: "Ce que vous avez été sur ce projet. Affiché tel quel dans la fiche.",
+  },
   { type: "text", name: "year", label: "Année", placeholder: "2026" },
   { type: "textarea", name: "summary", label: "Résumé", rows: 3 },
+  {
+    type: "lines",
+    name: "services",
+    label: "Prestations",
+    rows: 4,
+    help: "Une par ligne — Branding, Design, Développement… Vide, la colonne n'apparaît pas.",
+  },
   {
     type: "url",
     name: "href",

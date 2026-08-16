@@ -286,6 +286,19 @@
   }
 }
 
+/* ------------------------------------------- CARROUSEL DE RÉALISATIONS ---
+ * La barre de défilement doublerait les pastilles, et couperait le fond
+ * flouté qui va d'un bord à l'autre de la fiche.
+ * ------------------------------------------------------------------------*/
+
+.works-track {
+  scrollbar-width: none;
+}
+
+.works-track::-webkit-scrollbar {
+  display: none;
+}
+
 /* ------------------------------------------------- CORPS D'ARTICLE ---
  * Mise en forme du HTML produit par le Markdown des articles. Ces éléments
  * n'ont pas de classes : on les stylise depuis leur conteneur.

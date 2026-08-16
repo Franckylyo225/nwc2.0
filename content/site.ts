@@ -221,10 +221,19 @@ export const site = {
   works: {
     eyebrow: "Réalisations",
     title: "Projets récents",
-    intro: "Une sélection de travaux menés de bout en bout.",
+    intro:
+      "Nous accompagnons des entreprises de secteurs très différents, de la première idée à la mise en ligne. Voici une sélection de projets récents.",
     /**
+     * Les projets défilent un par un, en grand. Chaque fiche affiche l'année,
+     * le rôle tenu et les prestations livrées.
+     *
      * `image` : chemin d'une image dans /public (ex. "/works/mon-projet.jpg").
-     * Laisse la valeur à null : un visuel dégradé propre s'affiche à la place.
+     * Format portrait conseillé — c'est ainsi qu'elle est cadrée, et la même
+     * image sert de fond flouté à la fiche. Laisse la valeur à `null` : un
+     * visuel dégradé propre s'affiche à la place.
+     *
+     * `category` est le rôle tenu, `services` les prestations, une par ligne
+     * dans l'administration. Une liste vide masque simplement la colonne.
      */
     items: [
       {
@@ -233,6 +242,7 @@ export const site = {
         category: "Site vitrine & identité",
         summary:
           "[À REMPLIR — une phrase sur le contexte et le résultat obtenu, idéalement chiffré.]",
+        services: ["Identité", "Design", "Développement"],
         href: "#",
         image: null as string | null,
       },
@@ -242,6 +252,7 @@ export const site = {
         category: "E-commerce",
         summary:
           "[À REMPLIR — une phrase sur le contexte et le résultat obtenu, idéalement chiffré.]",
+        services: ["Design", "Développement", "Paiement en ligne"],
         href: "#",
         image: null as string | null,
       },
@@ -251,11 +262,11 @@ export const site = {
         category: "Refonte & SEO",
         summary:
           "[À REMPLIR — une phrase sur le contexte et le résultat obtenu, idéalement chiffré.]",
+        services: ["Audit", "Refonte", "Référencement"],
         href: "#",
         image: null as string | null,
       },
     ],
-    cta: { label: "Voir tous les projets", href: "#contact" },
   },
 
   /* ---------------------------------------------------------- TÉMOIGNAGES */

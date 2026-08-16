@@ -28,8 +28,11 @@ export type WorkItem = {
   id: string;
   name: string;
   year: string;
+  /** Rôle tenu sur le projet. */
   category: string;
   summary: string;
+  /** Prestations livrées. Vide, la colonne disparaît de la fiche. */
+  services: string[];
   href: string;
   image: string | null;
 };
@@ -111,6 +114,7 @@ export async function getWorks(): Promise<WorkItem[]> {
       year: item.year,
       category: item.category,
       summary: item.summary,
+      services: [...item.services],
       href: item.href,
       image: item.image,
     }));
@@ -127,6 +131,7 @@ export async function getWorks(): Promise<WorkItem[]> {
     year: row.year,
     category: row.category,
     summary: row.summary,
+    services: row.services,
     href: row.href ?? "#",
     image: row.image,
   }));

@@ -105,8 +105,12 @@ model Work {
   name      String
   slug      String   @unique
   year      String
+  /// Rôle tenu sur le projet, affiché tel quel dans la fiche du carrousel.
   category  String
   summary   String
+  /// Prestations livrées, une par ligne dans l'administration. Vide, la
+  /// colonne correspondante disparaît de la fiche.
+  services  String[]
   href      String?
   image     String?
   position  Int      @default(0)

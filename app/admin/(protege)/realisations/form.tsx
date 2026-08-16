@@ -30,6 +30,7 @@ export async function WorkForm({
             category: row.category,
             year: row.year,
             summary: row.summary,
+            services: row.services,
             href: row.href,
             image: row.image,
             position: row.position,

@@ -122,6 +122,7 @@ async function main() {
         year: item.year,
         category: item.category,
         summary: item.summary,
+        services: [...item.services],
         href: item.href === "#" ? null : item.href,
         image: item.image,
         position: index,
