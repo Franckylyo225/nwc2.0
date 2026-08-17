@@ -54,7 +54,7 @@ export const workFields: Field[] = [
     name: "services",
     label: "Prestations",
     rows: 4,
-    help: "Une par ligne — Branding, Design, Développement… Vide, la colonne n'apparaît pas.",
+    help: "Une par ligne, ou séparées par des virgules — Branding, Design, Développement… Elles s'affichent en liste sur la fiche. Vide, la colonne n'apparaît pas.",
   },
   {
     type: "url",

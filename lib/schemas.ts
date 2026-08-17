@@ -52,6 +52,26 @@ export const linesToArray = z
       .filter(Boolean),
   );
 
+/**
+ * Comme `linesToArray`, mais la virgule sépare aussi.
+ *
+ * Réservé aux listes d'**étiquettes courtes** — prestations, mots-clés. Devant
+ * un champ qui attend « Design, Développement, SEO », on tape naturellement la
+ * ligne d'un trait ; n'accepter que le retour chariot produit alors une seule
+ * entrée, et la mise en page à l'écran s'effondre en un bloc de texte.
+ *
+ * À ne surtout pas appliquer à `linesToArray` : les puces de services sont des
+ * phrases, et la virgule y est de la ponctuation, pas un séparateur.
+ */
+export const labelsToArray = z
+  .string()
+  .transform((value) =>
+    value
+      .split(/[\n,]/)
+      .map((label) => label.trim())
+      .filter(Boolean),
+  );
+
 const position = z.coerce.number().int().min(0).max(999).default(0);
 const published = z
   .union([z.literal("on"), z.literal("true"), z.literal("")])
@@ -83,7 +103,7 @@ export const workSchema = z.object({
   year: text("L'année", 20),
   category: text("Le rôle", 80),
   summary: text("Le résumé", 600),
-  services: linesToArray,
+  services: labelsToArray,
   href: optionalText,
   image: optionalText,
   position,

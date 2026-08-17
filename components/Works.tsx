@@ -31,18 +31,38 @@ export function Works({ items }: { items: WorkItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    <section id="realisations" className="bg-ink py-20 text-white sm:py-24">
-      <Reveal className="shell mb-12 flex flex-col gap-5">
-        <span className="inline-flex w-fit items-center gap-2 rounded-pill bg-white/10 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-accent">
-          <span aria-hidden className="size-1.5 rounded-full bg-accent" />
-          {works.eyebrow}
-        </span>
-        <h2 className="display text-4xl sm:text-5xl lg:text-[3.5rem]">
-          {works.title}
-        </h2>
-      </Reveal>
-
-      <WorksCarousel count={items.length} label={works.title}>
+    /* `relative` sert de repère aux décors : ils sont posés par le carrousel
+       mais doivent couvrir la section entière, titre compris.
+       `overflow-hidden` retient le débord du flou. */
+    <section
+      id="realisations"
+      className="relative overflow-hidden bg-ink py-20 text-white sm:py-24"
+    >
+      <WorksCarousel
+        count={items.length}
+        label={works.title}
+        /* Les décors sont rendus côté serveur et seulement permutés par le
+           carrousel : `next/image` reste hors du bundle client. */
+        backdrops={items.map((work, i) => (
+          <Backdrop key={work.id} image={work.image} index={i} />
+        ))}
+        header={
+          <Reveal className="shell mb-12 flex flex-col gap-5">
+            <span className="inline-flex w-fit items-center gap-2 rounded-pill bg-white/10 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-accent">
+              <span aria-hidden className="size-1.5 rounded-full bg-accent" />
+              {works.eyebrow}
+            </span>
+            <h2 className="display text-4xl sm:text-5xl lg:text-[3.5rem]">
+              {works.title}
+            </h2>
+            {/* Le propos de la section vit ici, une fois : chaque fiche porte
+                désormais la description de son propre projet. */}
+            <p className="max-w-xl text-lg leading-relaxed text-white/55">
+              {works.intro}
+            </p>
+          </Reveal>
+        }
+      >
         {items.map((work, i) => (
           <WorkSlide
             key={work.id}
@@ -56,6 +76,39 @@ export function Works({ items }: { items: WorkItem[] }) {
         ))}
       </WorksCarousel>
     </section>
+  );
+}
+
+/**
+ * Décor d'un projet : son visuel, agrandi et flouté à outrance.
+ *
+ * C'est ce qui donne sa couleur à toute la section — elle change avec la
+ * fiche affichée, sans qu'aucune teinte soit à saisir dans l'administration.
+ * Purement décoratif : l'image nette de la fiche porte déjà le sens.
+ */
+function Backdrop({ image, index }: { image: string | null; index: number }) {
+  if (!image) {
+    return (
+      <div
+        className={cx(
+          "size-full bg-gradient-to-br",
+          placeholders[index % placeholders.length],
+        )}
+      />
+    );
+  }
+
+  return (
+    <Image
+      src={image}
+      alt=""
+      fill
+      sizes="100vw"
+      /* Une vignette suffit : l'image est floutée au point de n'être plus
+         qu'un aplat de couleurs. */
+      quality={20}
+      className="scale-125 object-cover opacity-45 blur-[80px]"
+    />
   );
 }
 
@@ -75,36 +128,17 @@ function WorkSlide({
   const counter = (value: number) => String(value).padStart(2, "0");
 
   return (
-    <article className="relative w-full shrink-0 snap-center overflow-hidden">
-      {/* Décor : le visuel du projet, agrandi et flouté. Purement décoratif,
-          donc masqué aux lecteurs d'écran — l'image nette porte déjà le sens. */}
-      <div aria-hidden className="pointer-events-none absolute inset-0">
-        {work.image ? (
-          <Image
-            src={work.image}
-            alt=""
-            fill
-            sizes="100vw"
-            /* Une vignette suffit : l'image est floutée à outrance. */
-            quality={20}
-            className="scale-125 object-cover opacity-45 blur-[80px]"
-          />
-        ) : (
-          <div
-            className={cx(
-              "size-full bg-gradient-to-br",
-              placeholders[index % placeholders.length],
-            )}
-          />
-        )}
-      </div>
-
+    /* La fiche est transparente : son décor est posé au niveau de la section,
+       pour teinter aussi le titre — il ne défile donc pas avec elle. */
+    <article className="w-full shrink-0 snap-center">
       {/* `pb-28` réserve la place des commandes, posées par-dessus la piste. */}
-      <div className="shell relative grid gap-10 pb-28 pt-12 lg:grid-cols-[1fr_minmax(0,22rem)_1fr] lg:items-stretch lg:gap-12 lg:pt-16">
-        {/* Colonne de gauche : le propos en haut, l'identité du projet en bas.
-            Sur mobile elle passe sous le visuel — le nom doit suivre l'image. */}
+      <div className="shell grid gap-10 pb-28 pt-12 lg:grid-cols-[1fr_minmax(0,22rem)_1fr] lg:items-stretch lg:gap-12 lg:pt-16">
+        {/* Colonne de gauche : le projet raconté en haut, nommé en bas. Le nom
+            se pose au pied de la colonne, à la manière du modèle — l'œil
+            descend le long du texte et tombe dessus.
+            Sur mobile elle passe sous le visuel : le nom doit suivre l'image. */}
         <div className="order-2 flex flex-col justify-between gap-10 lg:order-1">
-          <p className="max-w-xs leading-relaxed text-white/55">{works.intro}</p>
+          <p className="max-w-xs leading-relaxed text-white/55">{work.summary}</p>
 
           <div className="flex flex-col gap-4">
             <p className="text-sm text-white/45">
@@ -115,9 +149,6 @@ function WorkSlide({
             <h3 className="display text-5xl sm:text-6xl lg:text-7xl">
               {work.name}
             </h3>
-            <p className="max-w-sm leading-relaxed text-white/55">
-              {work.summary}
-            </p>
           </div>
         </div>
 
@@ -148,13 +179,16 @@ function WorkSlide({
           <Meta label="Année">{work.year}</Meta>
           <Meta label="Rôle">{work.category}</Meta>
 
+          {/* Une vraie liste : les prestations sont des éléments distincts, et
+              un lecteur d'écran doit les annoncer comme tels. Pas de puces —
+              l'empilement suffit à les séparer, et le modèle n'en a pas. */}
           {work.services.length > 0 ? (
             <Meta label="Prestations">
-              <span className="flex flex-col gap-1.5">
+              <ul className="flex flex-col gap-1.5">
                 {work.services.map((service) => (
-                  <span key={service}>{service}</span>
+                  <li key={service}>{service}</li>
                 ))}
-              </span>
+              </ul>
             </Meta>
           ) : null}
 

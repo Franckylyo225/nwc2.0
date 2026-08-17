@@ -17,10 +17,16 @@ import { cx } from "./ui";
  */
 export function WorksCarousel({
   children,
+  backdrops,
+  header,
   count,
   label,
 }: {
   children: ReactNode;
+  /** Un décor par projet, rendu côté serveur ; seul l'affiché est opaque. */
+  backdrops: ReactNode[];
+  /** Titre de la section : il vit sous les décors, donc à l'intérieur d'ici. */
+  header: ReactNode;
   count: number;
   label: string;
 }) {
@@ -53,54 +59,78 @@ export function WorksCarousel({
   };
 
   return (
-    <div className="relative">
-      <div
-        ref={track}
-        /* `tabIndex` rend la piste focalisable : les flèches du clavier
-           défilent alors, comme dans n'importe quelle zone défilante. */
-        tabIndex={0}
-        role="group"
-        aria-label={label}
-        className="works-track flex snap-x snap-mandatory overflow-x-auto focus-visible:outline-none"
-      >
-        {children}
+    <>
+      {/* Décors superposés, tous montés, un seul visible. Les permuter par
+          l'opacité plutôt que par le montage donne le fondu d'une couleur à
+          l'autre, et évite de recharger une image déjà vue.
+
+          `absolute inset-0` se résout sur la <section>, seul ancêtre
+          positionné : le décor couvre donc le titre autant que la fiche. */}
+      <div aria-hidden className="pointer-events-none absolute inset-0">
+        {backdrops.map((backdrop, i) => (
+          <div
+            key={i}
+            className={cx(
+              "absolute inset-0 transition-opacity duration-700 ease-smooth",
+              i === index ? "opacity-100" : "opacity-0",
+            )}
+          >
+            {backdrop}
+          </div>
+        ))}
       </div>
 
-      {/* Commandes : au-dessus de la piste, jamais dans le flux — la fiche
-          occupe déjà toute la largeur. */}
-      <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center px-5 pb-8 sm:px-8">
-        <div className="pointer-events-auto flex items-center gap-2 rounded-pill bg-white/10 p-1.5 backdrop-blur-md">
-          <Arrow
-            direction="previous"
-            disabled={index === 0}
-            onClick={() => goTo(index - 1)}
-          />
+      <div className="relative">{header}</div>
 
-          <ol className="flex items-center gap-1.5 px-1">
-            {Array.from({ length: count }, (_, i) => (
-              <li key={i}>
-                <button
-                  type="button"
-                  onClick={() => goTo(i)}
-                  aria-label={`Projet ${i + 1} sur ${count}`}
-                  aria-current={i === index ? "true" : undefined}
-                  className={cx(
-                    "block size-1.5 rounded-full transition-all duration-300 ease-smooth",
-                    i === index ? "w-5 bg-white" : "bg-white/40 hover:bg-white/70",
-                  )}
-                />
-              </li>
-            ))}
-          </ol>
+      <div className="relative">
+        <div
+          ref={track}
+          /* `tabIndex` rend la piste focalisable : les flèches du clavier
+             défilent alors, comme dans n'importe quelle zone défilante. */
+          tabIndex={0}
+          role="group"
+          aria-label={label}
+          className="works-track flex snap-x snap-mandatory overflow-x-auto focus-visible:outline-none"
+        >
+          {children}
+        </div>
 
-          <Arrow
-            direction="next"
-            disabled={index >= count - 1}
-            onClick={() => goTo(index + 1)}
-          />
+        {/* Commandes : au-dessus de la piste, jamais dans le flux — la fiche
+            occupe déjà toute la largeur. */}
+        <div className="pointer-events-none absolute inset-x-0 bottom-0 flex justify-center px-5 pb-8 sm:px-8">
+          <div className="pointer-events-auto flex items-center gap-2 rounded-pill bg-white/10 p-1.5 backdrop-blur-md">
+            <Arrow
+              direction="previous"
+              disabled={index === 0}
+              onClick={() => goTo(index - 1)}
+            />
+
+            <ol className="flex items-center gap-1.5 px-1">
+              {Array.from({ length: count }, (_, i) => (
+                <li key={i}>
+                  <button
+                    type="button"
+                    onClick={() => goTo(i)}
+                    aria-label={`Projet ${i + 1} sur ${count}`}
+                    aria-current={i === index ? "true" : undefined}
+                    className={cx(
+                      "block size-1.5 rounded-full transition-all duration-300 ease-smooth",
+                      i === index ? "w-5 bg-white" : "bg-white/40 hover:bg-white/70",
+                    )}
+                  />
+                </li>
+              ))}
+            </ol>
+
+            <Arrow
+              direction="next"
+              disabled={index >= count - 1}
+              onClick={() => goTo(index + 1)}
+            />
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }
 
