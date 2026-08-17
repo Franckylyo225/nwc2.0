@@ -92,7 +92,9 @@ export const slug = z
 export const serviceSchema = z.object({
   title: text("Le titre", 120),
   description: text("La description", 600),
-  bullets: linesToArray,
+  /* Des étiquettes, pas des phrases : elles s'affichent en pastilles. */
+  bullets: labelsToArray,
+  image: optionalText,
   position,
   published,
 });

@@ -28,6 +28,7 @@ export async function ServiceForm({
             title: row.title,
             description: row.description,
             bullets: row.bullets,
+            image: row.image,
             position: row.position,
             published: row.published,
           }

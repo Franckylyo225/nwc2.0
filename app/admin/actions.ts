@@ -309,6 +309,7 @@ function makeActions<S extends z.ZodType>(options: {
 const services = makeActions({
   collection: "service",
   schema: serviceSchema,
+  imageField: "image",
   delegate: () => prisma.service as never,
 });
 

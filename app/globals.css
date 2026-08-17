@@ -155,6 +155,108 @@
   }
 }
 
+/**
+ * Panneau de service qui prend la main.
+ *
+ * Les panneaux inactifs sont en `hidden`, donc en `display: none` : ils ne
+ * peuvent pas se fondre l'un dans l'autre — une transition n'a rien à
+ * interpoler quand l'élément n'est pas rendu. On anime donc l'arrivée, et
+ * elle se rejoue à chaque fois puisque l'élément réintègre le rendu.
+ *
+ * Le léger retrait d'échelle donne le sentiment que le panneau s'avance,
+ * plutôt qu'il n'apparaît sur place.
+ */
+/* ------------------------------------------- PARCOURS DE CONTACT ---
+ * Modale en trois étapes. Les étapes ne coexistent jamais : une seule est
+ * montée à la fois, d'où des animations d'arrivée plutôt que des
+ * transitions. Le sens du glissement dit lequel des deux boutons a été
+ * pressé — on avance par la droite, on revient par la gauche.
+ * ------------------------------------------------------------------------*/
+
+@keyframes shell-in {
+  from {
+    opacity: 0;
+    transform: scale(0.97);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes step-forward {
+  from {
+    opacity: 0;
+    transform: translateX(2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes step-back {
+  from {
+    opacity: 0;
+    transform: translateX(-2.5rem);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/** Coche de confirmation : le cercle se pose, la coche se trace ensuite. */
+@keyframes check-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.4);
+  }
+  60% {
+    opacity: 1;
+    transform: scale(1.08);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+@keyframes check-draw {
+  from {
+    stroke-dashoffset: 24;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/**
+ * Respiration du bouton d'envoi, une fois le formulaire valide. Assez
+ * discrète pour ne pas distraire, assez présente pour signaler que la
+ * dernière action est disponible.
+ */
+@keyframes soft-pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 0 rgb(236 76 121 / 0.5);
+  }
+  50% {
+    box-shadow: 0 0 0 0.65rem rgb(236 76 121 / 0);
+  }
+}
+
+@keyframes service-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem) scale(0.985);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
 @keyframes rise-in-mask {
   from {
     opacity: 0;

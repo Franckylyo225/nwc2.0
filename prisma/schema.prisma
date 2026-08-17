@@ -90,7 +90,11 @@ model Service {
   id          String   @id @default(cuid())
   title       String
   description String
+  /// Points clés, affichés en pastilles sous la description.
   bullets     String[]
+  /// Illustration du service, montrée quand son onglet est actif. Sans elle,
+  /// un dégradé occupe exactement la même place.
+  image       String?
   position    Int      @default(0)
   published   Boolean  @default(true)
   createdAt   DateTime @default(now())

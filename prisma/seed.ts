@@ -104,6 +104,7 @@ async function main() {
         title: item.title,
         description: item.description,
         bullets: [...item.bullets],
+        image: item.image,
         position: index,
       })),
     });

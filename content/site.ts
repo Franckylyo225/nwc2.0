@@ -174,45 +174,51 @@ export const site = {
   /* ------------------------------------------------------------- SERVICES */
   services: {
     eyebrow: "Services",
-    title: "Tout ce qu'il faut pour exister en ligne",
-    intro:
-      "Une équipe unique du cadrage à la mise en ligne. Pas de sous-traitance en cascade, pas d'aller-retours qui traînent.",
+    title: "Ce que nous faisons de mieux",
+    /* Pas de chapô ici : les onglets enchaînent directement sous le titre, et
+       chaque service porte déjà sa propre description. */
     items: [
       {
         title: "Sites vitrines & landing pages",
         description:
           "Un site clair, rapide, qui explique ce que vous faites et transforme le visiteur en contact.",
         bullets: ["Design sur-mesure", "Rédaction assistée", "Responsive complet"],
+        image: null as string | null,
       },
       {
         title: "Identité visuelle & logo",
         description:
           "Une identité cohérente : logo, palette, typographies, règles d'usage. Livrée prête à l'emploi.",
         bullets: ["Logo & déclinaisons", "Charte graphique", "Kit réseaux sociaux"],
+        image: null as string | null,
       },
       {
         title: "E-commerce",
         description:
           "Boutique en ligne installée, configurée et optimisée pour vendre dès le premier jour.",
         bullets: ["Shopify / WooCommerce", "Tunnel d'achat", "Paiement & livraison"],
+        image: null as string | null,
       },
       {
         title: "Refonte & optimisation",
         description:
           "On repart de l'existant : on garde ce qui marche, on corrige la vitesse, le SEO et les conversions.",
         bullets: ["Audit technique", "Core Web Vitals", "SEO on-page"],
+        image: null as string | null,
       },
       {
         title: "Applications web sur-mesure",
         description:
           "Espaces clients, tableaux de bord, outils métier. Développés proprement, pensés pour durer.",
         bullets: ["Next.js / React", "API & intégrations", "Hébergement inclus"],
+        image: null as string | null,
       },
       {
         title: "Maintenance & évolutions",
         description:
           "Mises à jour, sauvegardes, sécurité et petites évolutions mensuelles. Vous ne touchez à rien.",
         bullets: ["Sauvegardes", "Correctifs sécurité", "Support réactif"],
+        image: null as string | null,
       },
     ],
   },

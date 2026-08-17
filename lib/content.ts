@@ -22,6 +22,8 @@ export type ServiceItem = {
   title: string;
   description: string;
   bullets: string[];
+  /** Illustration de l'onglet. Sans elle, un dégradé prend la même place. */
+  image: string | null;
 };
 
 export type WorkItem = {
@@ -90,6 +92,7 @@ export async function getServices(): Promise<ServiceItem[]> {
       title: item.title,
       description: item.description,
       bullets: [...item.bullets],
+      image: item.image,
     }));
   }
 
@@ -103,6 +106,7 @@ export async function getServices(): Promise<ServiceItem[]> {
     title: row.title,
     description: row.description,
     bullets: row.bullets,
+    image: row.image,
   }));
 }
 
