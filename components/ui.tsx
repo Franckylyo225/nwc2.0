@@ -24,6 +24,17 @@ const buttonVariants: Record<ButtonVariant, string> = {
   ghost: "text-ink px-3 py-2 hover:text-accent",
 };
 
+/**
+ * Habillage d'un bouton, sans son élément.
+ *
+ * Exporté pour les boutons qui ne sont pas des liens — celui qui ouvre le
+ * parcours de contact, par exemple. Sans cela, ses classes seraient recopiées
+ * et les deux apparences divergeraient au premier ajustement.
+ */
+export function buttonClasses(variant: ButtonVariant = "primary", className?: string) {
+  return cx(buttonBase, buttonVariants[variant], className);
+}
+
 export function Button({
   href,
   variant = "primary",
@@ -42,7 +53,7 @@ export function Button({
    * part en <a> brut : le routeur refuse les href contenant des crochets.
    */
   const isInternal = href.startsWith("/") || href.startsWith("#");
-  const classes = cx(buttonBase, buttonVariants[variant], className);
+  const classes = buttonClasses(variant, className);
 
   if (!isInternal) {
     return (

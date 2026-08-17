@@ -32,6 +32,8 @@ export type SiteSettings = {
     aboutBanner: string | null;
     /** Photo de la section « Le studio ». */
     aboutStudio: string | null;
+    /** Visuel posé à côté de l'invitation à démarrer un projet. */
+    contact: string | null;
   };
 };
 
@@ -51,7 +53,7 @@ export const DEFAULT_SETTINGS: SiteSettings = {
   maintenanceEtaIsFuture: false,
   showContact: true,
   heroImages: { 1: null, 2: null, 3: null },
-  blockImages: { aboutBanner: null, aboutStudio: null },
+  blockImages: { aboutBanner: null, aboutStudio: null, contact: null },
 };
 
 export async function getSettings(): Promise<SiteSettings> {
@@ -77,6 +79,7 @@ export async function getSettings(): Promise<SiteSettings> {
     blockImages: {
       aboutBanner: row.aboutBannerImage,
       aboutStudio: row.aboutStudioImage,
+      contact: row.contactImage,
     },
   };
 }

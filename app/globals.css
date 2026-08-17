@@ -20,6 +20,18 @@
   --color-accent-soft: #fde9ee;
   --color-accent-ink: #ffffff;
 
+  /* Palette propre au parcours de contact (components/ContactModal.tsx).
+     La modale occupe tout l'écran : elle est sa propre pièce, et n'emprunte
+     pas les couleurs claires du site. Un rose légèrement plus doux que
+     l'accent y remplace le rouge framboise, qui vibre sur fond noir.
+     Pour aligner la modale sur le reste du site : remplacer
+     `--color-shell-accent` par la valeur de `--color-accent`. */
+  --color-shell-bg: #0a0a0a;
+  --color-shell-card: #1a1a1a;
+  --color-shell-card-active: #242424;
+  --color-shell-line: #2e2e2e;
+  --color-shell-accent: #ec4c79;
+
   /* Typographies (injectées par next/font dans app/layout.tsx) */
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, -apple-system, sans-serif;
   --font-display: var(--font-cal), var(--font-inter), ui-sans-serif, sans-serif;

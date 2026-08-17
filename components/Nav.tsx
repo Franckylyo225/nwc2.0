@@ -3,7 +3,8 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { site } from "@/content/site";
-import { ArrowUpRight, BrandMark, Button, cx } from "./ui";
+import { ContactTrigger } from "./ContactTrigger";
+import { ArrowUpRight, BrandMark, buttonClasses, cx } from "./ui";
 
 export function Nav() {
   const [scrolled, setScrolled] = useState(false);
@@ -66,10 +67,10 @@ export function Nav() {
           {/* Masqué via un conteneur : `hidden` sur le bouton lui-même serait
               écrasé par le `inline-flex` de sa classe de base. */}
           <span className="hidden sm:block">
-            <Button href={site.nav.cta.href}>
+            <ContactTrigger className={buttonClasses()}>
               {site.nav.cta.label}
               <ArrowUpRight />
-            </Button>
+            </ContactTrigger>
           </span>
 
           {/* Bouton burger — mobile */}
@@ -120,14 +121,13 @@ export function Nav() {
             </li>
           ))}
           <li className="mt-4 px-4">
-            <Button
-              href={site.nav.cta.href}
-              className="w-full"
+            <ContactTrigger
+              className={buttonClasses("primary", "w-full")}
               onClick={() => setOpen(false)}
             >
               {site.nav.cta.label}
               <ArrowUpRight />
-            </Button>
+            </ContactTrigger>
           </li>
         </ul>
       </div>

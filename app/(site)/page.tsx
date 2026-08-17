@@ -55,7 +55,7 @@ export default async function Home() {
         <Products items={products} />
         <LatestArticles items={articles} />
         <Faq />
-        <Contact />
+        <Contact image={settings.blockImages.contact} />
       </main>
       <Footer />
     </>

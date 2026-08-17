@@ -31,17 +31,6 @@ const optionalBounded = (label: string, max: number) =>
     .transform((value) => (value === "" ? null : value))
     .nullable();
 
-/** Facultatif, et limité aux choix proposés par le formulaire. */
-const optionalChoice = (label: string, choices: readonly string[]) =>
-  z
-    .string()
-    .trim()
-    .transform((value) => (value === "" ? null : value))
-    .nullable()
-    .refine((value) => value === null || choices.includes(value), {
-      message: `${label} ne fait pas partie des choix proposés.`,
-    });
-
 /** Découpe une saisie « un élément par ligne » en tableau. */
 export const linesToArray = z
   .string()
@@ -172,6 +161,7 @@ export const settingsSchema = z.object({
   heroImage3: optionalText,
   aboutBannerImage: optionalText,
   aboutStudioImage: optionalText,
+  contactImage: optionalText,
 });
 
 /**
@@ -185,34 +175,110 @@ export const SETTINGS_IMAGE_FIELDS = [
   "heroImage3",
   "aboutBannerImage",
   "aboutStudioImage",
+  "contactImage",
 ] as const;
 
+/* --------------------------------------------------- Parcours de contact --- */
+
+const { flow } = site.contact;
+
+/** Traduit un identifiant du parcours en son libellé, ou `undefined`. */
+const labelOf = <T extends { id: string; label: string }>(
+  options: readonly T[],
+  id: string,
+) => options.find((option) => option.id === id)?.label;
+
 /**
- * Message du formulaire de contact public.
- *
- * Seul schéma dont les données viennent d'un inconnu : chaque champ est borné,
- * et les deux listes déroulantes n'acceptent que les choix de content/site.ts.
- * Le corps exige quelques mots — « ok » n'est pas une demande, et c'est ce que
- * postent les robots qui passent les autres filtres.
+ * Réponse unique : on valide l'identifiant reçu, puis on lui substitue son
+ * libellé. Dans cet ordre — après le `refine`, la correspondance est acquise,
+ * et l'assertion qui suit ne masque donc aucun cas.
  */
-export const messageSchema = z.object({
-  name: text("Le nom", 120),
-  email: z
+const choice = (message: string, options: readonly { id: string; label: string }[]) =>
+  z
     .string()
     .trim()
-    .toLowerCase()
-    .max(200, "L'adresse e-mail dépasse 200 caractères.")
-    .email("Adresse e-mail invalide."),
-  phone: optionalBounded("Le téléphone", 40),
-  company: optionalBounded("L'entreprise", 120),
-  projectType: optionalChoice("Le type de projet", site.contact.form.projectTypes),
-  budget: optionalChoice("Le budget", site.contact.form.budgets),
-  body: z
-    .string()
-    .trim()
-    .min(20, "Décrivez votre projet en quelques mots (20 caractères minimum).")
-    .max(5000, "Le message dépasse 5000 caractères."),
-});
+    .refine((id) => Boolean(labelOf(options, id)), message)
+    .transform((id) => labelOf(options, id) as string);
+
+/**
+ * Demande envoyée depuis le parcours de contact.
+ *
+ * Seul schéma dont les données viennent d'un inconnu. Les trois questions
+ * n'acceptent que les identifiants déclarés dans content/site.ts, et ce sont
+ * les **libellés** qui sont enregistrés : changer un libellé plus tard ne
+ * réécrit pas les demandes déjà reçues.
+ *
+ * Le champ libre n'est exigé que si « Autre service » est coché — c'est la
+ * seule branche où le visiteur a quelque chose à dire que les cases ne disent
+ * pas.
+ */
+export const messageSchema = z
+  .object({
+    name: text("Le nom", 120),
+
+    /* Les identifiants arrivent en une seule chaîne : un `FormData` n'a pas
+       de tableau, et une valeur répétée serait plus fragile à relire. */
+    services: z
+      .string()
+      .transform((value) => value.split(",").map((id) => id.trim()).filter(Boolean))
+      .refine((ids) => ids.length > 0, "Choisissez au moins un besoin.")
+      .refine(
+        (ids) => ids.every((id) => labelOf(flow.services, id)),
+        "Un des besoins choisis n'existe pas.",
+      )
+      /* Le `?? []` ne retire jamais rien : le refine ci-dessus a déjà écarté
+         les identifiants inconnus. Il n'est là que pour le typage. */
+      .transform((ids) => ids.flatMap((id) => labelOf(flow.services, id) ?? [])),
+
+    scope: choice("Choisissez l'envergure du projet.", flow.scopes),
+
+    preferredContact: choice(
+      "Choisissez comment vous souhaitez être recontacté.",
+      flow.channels,
+    ),
+
+    /* Une seule des deux coordonnées est remplie, selon le canal choisi. */
+    email: z
+      .string()
+      .trim()
+      .toLowerCase()
+      .max(200, "L'adresse e-mail dépasse 200 caractères.")
+      .refine(
+        (value) => value === "" || z.string().email().safeParse(value).success,
+        "Adresse e-mail invalide.",
+      )
+      .transform((value) => (value === "" ? null : value)),
+
+    phone: z
+      .string()
+      .trim()
+      .max(40, "Le numéro dépasse 40 caractères.")
+      .refine(
+        (value) => value === "" || /^[+\d][\d\s().-]{5,}$/.test(value),
+        "Numéro de téléphone invalide.",
+      )
+      .transform((value) => (value === "" ? null : value)),
+
+    body: optionalBounded("La précision", 2000),
+  })
+  .refine((data) => data.email !== null || data.phone !== null, {
+    message: "Laissez-nous une adresse e-mail ou un numéro.",
+    /* Rattaché au canal : c'est le champ que le visiteur a sous les yeux. */
+    path: ["contactValue"],
+  })
+  .refine(
+    (data) =>
+      !data.services.includes(otherServiceLabel()) || (data.body?.length ?? 0) >= 3,
+    {
+      message: "Dites-nous en deux mots de quoi il s'agit.",
+      path: ["body"],
+    },
+  );
+
+/** Libellé de l'option « Autre service », seule à exiger une précision. */
+function otherServiceLabel() {
+  return labelOf(flow.services, "autre") ?? "";
+}
 
 /**
  * Noms des deux champs pièges du formulaire de contact. Ils sont posés par le

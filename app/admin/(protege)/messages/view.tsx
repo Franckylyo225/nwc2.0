@@ -31,25 +31,47 @@ export async function loadMessage(id: string): Promise<Message> {
 
 /** Corps d'un message, partagé par la page pleine et le panneau latéral. */
 export function MessageView({ message }: { message: Message }) {
-  /* Destinataire, objet et salutation pré-remplis : répondre ne demande alors
-     qu'un clic, et la réponse part de la vraie boîte du studio, pas du site. */
-  const reply =
-    `mailto:${message.email}` +
-    `?subject=${encodeURIComponent("Votre projet — New Wave Conception")}` +
-    `&body=${encodeURIComponent(`Bonjour ${message.name},\n\n`)}`;
+  /**
+   * Bouton de réponse, adapté au canal demandé.
+   *
+   * WhatsApp veut le numéro en chiffres seuls, indicatif compris et sans le
+   * `+` : tout le reste — espaces, points, parenthèses — casse le lien.
+   *
+   * Pour un e-mail, destinataire, objet et salutation sont pré-remplis :
+   * répondre ne demande alors qu'un clic, et la réponse part de la vraie boîte
+   * du studio, pas du site.
+   */
+  const reply = message.email
+    ? {
+        label: "Répondre par e-mail",
+        href:
+          `mailto:${message.email}` +
+          `?subject=${encodeURIComponent("Votre projet — New Wave Conception")}` +
+          `&body=${encodeURIComponent(`Bonjour ${message.name},\n\n`)}`,
+      }
+    : {
+        label: "Répondre sur WhatsApp",
+        href: `https://wa.me/${(message.phone ?? "").replace(/\D/g, "")}?text=${encodeURIComponent(
+          `Bonjour ${message.name}, merci pour votre demande —`,
+        )}`,
+      };
 
   return (
     <div className="flex flex-col gap-8">
       <dl className="grid gap-x-6 gap-y-4 rounded-card bg-surface/60 px-5 py-5 ring-1 ring-line sm:grid-cols-2">
         <Detail label="Reçu le">{stamp.format(message.createdAt)}</Detail>
-        <Detail label="E-mail">
-          <a
-            href={`mailto:${message.email}`}
-            className="text-accent underline underline-offset-2"
-          >
-            {message.email}
-          </a>
-        </Detail>
+        <Detail label="Rappel souhaité par">{message.preferredContact}</Detail>
+
+        {message.email ? (
+          <Detail label="E-mail">
+            <a
+              href={`mailto:${message.email}`}
+              className="text-accent underline underline-offset-2"
+            >
+              {message.email}
+            </a>
+          </Detail>
+        ) : null}
         {message.phone ? (
           <Detail label="Téléphone">
             <a
@@ -60,26 +82,26 @@ export function MessageView({ message }: { message: Message }) {
             </a>
           </Detail>
         ) : null}
-        {message.company ? (
-          <Detail label="Entreprise">{message.company}</Detail>
-        ) : null}
-        {message.projectType ? (
-          <Detail label="Type de projet">{message.projectType}</Detail>
-        ) : null}
-        {message.budget ? <Detail label="Budget">{message.budget}</Detail> : null}
+
+        <Detail label="Besoins">{message.services.join(", ")}</Detail>
+        <Detail label="Envergure">{message.scope}</Detail>
       </dl>
 
-      {/* `whitespace-pre-line` restitue les paragraphes du visiteur. Le texte
-          n'est jamais interprété : c'est une saisie publique. */}
-      <p className="whitespace-pre-line leading-relaxed text-ink-soft">
-        {message.body}
-      </p>
+      {/* Précision libre, saisie quand « Autre service » est coché — donc
+          souvent absente. `whitespace-pre-line` restitue les paragraphes du
+          visiteur ; le texte n'est jamais interprété, c'est une saisie
+          publique. */}
+      {message.body ? (
+        <p className="whitespace-pre-line leading-relaxed text-ink-soft">
+          {message.body}
+        </p>
+      ) : null}
 
       <MessageActions
         id={message.id}
         status={message.status}
         author={message.name}
-        replyHref={reply}
+        reply={reply}
       />
     </div>
   );

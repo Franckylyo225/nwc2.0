@@ -14,7 +14,12 @@ export default async function MessagePage({
 
   return (
     <div className="max-w-2xl">
-      <PageHeader title={message.name} description={message.email} />
+      {/* La coordonnée sous le nom est celle que le visiteur a laissée : une
+          seule des deux est renseignée, selon le canal qu'il a choisi. */}
+      <PageHeader
+        title={message.name}
+        description={message.email ?? message.phone ?? undefined}
+      />
 
       <Link
         href="/admin/messages"

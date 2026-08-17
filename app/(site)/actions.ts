@@ -49,17 +49,17 @@ export async function sendMessage(
 
   const parsed = messageSchema.safeParse({
     name: formData.get("name"),
+    services: formData.get("services"),
+    scope: formData.get("scope"),
+    preferredContact: formData.get("preferredContact"),
     email: formData.get("email"),
     phone: formData.get("phone"),
-    company: formData.get("company"),
-    projectType: formData.get("projectType"),
-    budget: formData.get("budget"),
     body: formData.get("body"),
   });
 
   if (!parsed.success) {
     return {
-      error: "Le formulaire est incomplet.",
+      error: "La demande est incomplète.",
       fieldErrors: fieldErrorsOf(parsed.error),
     };
   }

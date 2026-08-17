@@ -19,13 +19,14 @@ export function MessageActions({
   id,
   status,
   author,
-  replyHref,
+  reply,
 }: {
   id: string;
   status: MessageStatus;
   /** Nom de l'expéditeur, repris dans la confirmation de suppression. */
   author: string;
-  replyHref: string;
+  /** Lien de réponse, e-mail ou WhatsApp selon le canal demandé. */
+  reply: { label: string; href: string };
 }) {
   const router = useRouter();
   const [pending, startTransition] = useTransition();
@@ -57,10 +58,12 @@ export function MessageActions({
 
       <div className="flex flex-wrap items-center gap-2">
         <a
-          href={replyHref}
+          href={reply.href}
+          target="_blank"
+          rel="noreferrer noopener"
           className="inline-flex items-center gap-2 rounded-pill bg-ink px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-accent"
         >
-          Répondre par e-mail
+          {reply.label}
         </a>
 
         <button

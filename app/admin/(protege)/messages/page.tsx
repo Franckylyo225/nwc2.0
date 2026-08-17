@@ -99,13 +99,15 @@ export default async function MessagesPage({
                     Nouveau
                   </span>
                 ) : null}
-                <span>{message.email}</span>
-                {message.projectType ? (
+                <span>{message.email ?? message.phone}</span>
+                {message.services.length > 0 ? (
                   <>
                     <span aria-hidden>·</span>
-                    <span>{message.projectType}</span>
+                    <span className="truncate">{message.services.join(", ")}</span>
                   </>
                 ) : null}
+                <span aria-hidden>·</span>
+                <span>{message.scope}</span>
                 <span aria-hidden>·</span>
                 <time dateTime={message.createdAt.toISOString()}>
                   {stamp.format(message.createdAt)}

@@ -12,7 +12,10 @@ export default async function MessageDrawer({
   const message = await loadMessage(id);
 
   return (
-    <Drawer title={message.name} description={message.email}>
+    <Drawer
+      title={message.name}
+      description={message.email ?? message.phone ?? undefined}
+    >
       <MessageView message={message} />
     </Drawer>
   );

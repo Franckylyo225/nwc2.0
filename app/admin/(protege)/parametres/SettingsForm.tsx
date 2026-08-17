@@ -50,6 +50,12 @@ const BLOCK_IMAGES = [
     label: "Photo de la section « Le studio »",
     help: "Le portrait ou la photo d'équipe affiché à côté du texte de présentation. Format portrait, 1000 × 1250 px environ.",
   },
+  {
+    name: "contactImage",
+    key: "contact",
+    label: "Visuel du bloc de contact",
+    help: "Le grand visuel posé à côté de l'invitation à démarrer un projet, tout en bas de l'accueil. Format paysage, 1600 × 1200 px environ. Aucun texte ne se pose dessus : choisis l'image qui donne le plus envie.",
+  },
 ] as const;
 
 const TABS = [

@@ -1,82 +1,31 @@
+import Image from "next/image";
 import { site } from "@/content/site";
 import { isDatabaseConfigured } from "@/lib/db";
-import { ContactForm } from "./ContactForm";
+import { ContactTrigger } from "./ContactTrigger";
 import { Reveal } from "./Reveal";
 import { ArrowUpRight } from "./ui";
 
 const { contact } = site;
 
-/** Un contenu encore à remplir ne doit pas produire un lien mort. */
-function isFilled(value: string) {
-  return !value.includes("[À REMPLIR");
-}
-
 /**
  * Section de contact — le point final de la page.
  *
- * Fond sombre, comme la carte d'appel à l'action qu'elle remplace : après la
- * FAQ, il faut une rupture franche pour que la fin de la page se voie. Le
- * formulaire est posé dessus en carte claire, seul élément lumineux de la
- * section, donc le premier regardé.
+ * Deux blocs côte à côte : à gauche l'invitation, dans une carte sombre ; à
+ * droite un visuel qui occupe les deux tiers. Rien d'autre — les coordonnées
+ * vivent dans le pied de page, les répéter ici affaiblirait le seul geste
+ * qu'on attend du visiteur.
+ *
+ * La carte est volontairement la plus étroite des deux : c'est le contraste
+ * avec l'image, et non sa taille, qui la fait regarder en premier.
  */
-export function Contact() {
+export function Contact({ image }: { image: string | null }) {
   return (
-    <section
-      id="contact"
-      className="relative overflow-hidden bg-ink py-24 text-white sm:py-32"
-    >
-      {/* Halo décoratif */}
-      <div
-        aria-hidden
-        className="pointer-events-none absolute -bottom-48 left-1/4 size-[40rem] -translate-x-1/2 rounded-full bg-accent/25 blur-[130px]"
-      />
-
-      <div className="shell relative grid gap-14 lg:grid-cols-[0.85fr_1.15fr] lg:items-start lg:gap-20">
-        <Reveal className="flex flex-col gap-6 lg:sticky lg:top-28">
-          <span className="inline-flex w-fit items-center gap-2 rounded-pill bg-white/10 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-accent">
-            <span aria-hidden className="size-1.5 rounded-full bg-accent" />
-            {contact.eyebrow}
-          </span>
-
-          <h2 className="display text-4xl sm:text-5xl lg:text-[3.5rem]">
-            {contact.title}
-          </h2>
-
-          <p className="max-w-md text-lg leading-relaxed text-white/60">
-            {contact.subtitle}
-          </p>
-
-          <address className="mt-2 flex flex-col gap-3 not-italic">
-            <Coordinate label="E-mail" href={`mailto:${contact.email}`}>
-              {contact.email}
-            </Coordinate>
-            <Coordinate label="Téléphone" href={`tel:${contact.phone}`}>
-              {contact.phone}
-            </Coordinate>
-            <span className="flex flex-col">
-              <span className="text-xs uppercase tracking-[0.14em] text-white/40">
-                Adresse
-              </span>
-              <span className="text-white/80">{contact.address}</span>
-            </span>
-          </address>
-
-          {isFilled(contact.booking.href) ? (
-            <a
-              href={contact.booking.href}
-              target="_blank"
-              rel="noreferrer noopener"
-              className="group mt-2 inline-flex w-fit items-center gap-2 rounded-pill px-5 py-2.5 text-sm font-medium text-white ring-1 ring-white/20 transition-colors hover:bg-white/10"
-            >
-              {contact.booking.label}
-              <ArrowUpRight className="transition-transform duration-300 ease-smooth group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-            </a>
-          ) : null}
-        </Reveal>
-
-        <Reveal delay={0.08}>
-          <div className="rounded-[1.75rem] bg-bg p-7 text-ink shadow-[0_40px_80px_-40px_rgba(0,0,0,0.6)] sm:p-9">
-            {isDatabaseConfigured() ? <ContactForm /> : <DirectContact />}
+    <section id="contact" className="py-20 sm:py-28">
+      <div className="shell">
+        <Reveal>
+          <div className="grid gap-4 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-5">
+            <Invitation />
+            <Visual image={image} />
           </div>
         </Reveal>
       </div>
@@ -86,47 +35,90 @@ export function Contact() {
 
 /* ------------------------------------------------------------------------ */
 
-function Coordinate({
-  label,
-  href,
-  children,
-}: {
-  label: string;
-  href: string;
-  children: string;
-}) {
+function Invitation() {
+  const available = isDatabaseConfigured();
+
   return (
-    <span className="flex flex-col">
-      <span className="text-xs uppercase tracking-[0.14em] text-white/40">
-        {label}
-      </span>
-      <a href={href} className="text-white/80 transition-colors hover:text-accent">
-        {children}
-      </a>
-    </span>
+    <div className="relative flex flex-col justify-between gap-10 overflow-hidden rounded-[1.75rem] bg-ink p-8 text-white sm:p-10">
+      <Squiggle />
+
+      <div className="relative flex flex-col gap-4">
+        <h2 className="display text-4xl sm:text-5xl">{contact.title}</h2>
+        <p className="max-w-xs leading-relaxed text-white/55">
+          {contact.subtitle}
+        </p>
+      </div>
+
+      {/* Sans base, le parcours n'aurait nulle part où déposer la demande :
+          le bouton laisse alors place à l'adresse, qui marche toujours. */}
+      {available ? (
+        <ContactTrigger className="group relative inline-flex w-full items-center justify-between gap-3 rounded-pill bg-white py-1.5 pl-6 pr-1.5 text-sm font-medium text-ink transition-colors hover:bg-white/90">
+          {contact.flow.open}
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-white transition-transform duration-300 ease-smooth group-hover:rotate-45">
+            <ArrowUpRight />
+          </span>
+        </ContactTrigger>
+      ) : (
+        <a
+          href={`mailto:${contact.email}`}
+          className="group relative inline-flex w-full items-center justify-between gap-3 rounded-pill bg-white py-1.5 pl-6 pr-1.5 text-sm font-medium text-ink transition-colors hover:bg-white/90"
+        >
+          {contact.email}
+          <span className="grid size-10 shrink-0 place-items-center rounded-full bg-accent text-white transition-transform duration-300 ease-smooth group-hover:rotate-45">
+            <ArrowUpRight />
+          </span>
+        </a>
+      )}
+    </div>
   );
 }
 
 /**
- * Repli affiché tant qu'aucune base n'est configurée : les messages n'auraient
- * nulle part où atterrir. Le site reste consultable et la section utile — on
- * renvoie simplement vers l'e-mail et le téléphone.
+ * Boucle décorative, en haut de la carte.
+ *
+ * Le seul trait de couleur de la section : il attire l'œil sur la carte
+ * sombre, que l'image voisine écraserait sans lui. Purement graphique, donc
+ * masqué aux lecteurs d'écran — et débordant volontairement du cadre, ce que
+ * l'`overflow-hidden` de la carte vient trancher.
  */
-function DirectContact() {
+function Squiggle() {
   return (
-    <div className="flex flex-col items-start gap-4">
-      <h3 className="display text-2xl text-ink">Écrivez-nous directement</h3>
-      <p className="leading-relaxed text-muted">
-        Décrivez votre projet en deux lignes — ce que vous voulez construire,
-        pour qui, et pour quand. Réponse sous 24 h ouvrées.
-      </p>
-      <a
-        href={`mailto:${contact.email}`}
-        className="mt-2 inline-flex items-center justify-center gap-2 rounded-pill bg-ink px-7 py-3.5 text-sm font-medium text-white transition-colors hover:bg-accent"
-      >
-        {contact.email}
-        <ArrowUpRight />
-      </a>
+    <svg
+      aria-hidden
+      viewBox="0 0 160 80"
+      fill="none"
+      className="pointer-events-none absolute -left-10 -top-6 w-52 text-accent"
+    >
+      <path
+        d="M-4 66C10 26 34 6 52 14c14 6 12 28-4 30-18 2-24-18-8-28C62 2 106 6 164 22"
+        stroke="currentColor"
+        strokeWidth="3"
+        strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+/**
+ * Le visuel du bloc, déposé depuis l'administration (Paramètres → CMS).
+ *
+ * Sans image, un dégradé occupe exactement la même place : la mise en page ne
+ * bouge pas au moment de la remplacer.
+ */
+function Visual({ image }: { image: string | null }) {
+  return (
+    <div className="relative aspect-4/3 overflow-hidden rounded-[1.75rem] bg-surface-2 sm:aspect-16/10 lg:aspect-auto lg:min-h-[26rem]">
+      {image ? (
+        <Image
+          src={image}
+          alt=""
+          fill
+          sizes="(max-width: 1024px) 100vw, 60vw"
+          className="object-cover"
+        />
+      ) : (
+        <div className="size-full bg-gradient-to-br from-accent/25 via-surface-2 to-surface" />
+      )}
     </div>
   );
 }

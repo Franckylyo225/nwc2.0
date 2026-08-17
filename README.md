@@ -110,42 +110,73 @@ Le contenu des articles s'écrit en **Markdown** (`## titre`, `**gras**`,
 
 Toute publication rafraîchit immédiatement les pages publiques concernées.
 
-### Le formulaire de contact
+### Le parcours de contact
 
-La section `#contact`, en bas de la page d'accueil, porte un vrai formulaire.
+« Démarrer un projet » — dans la navigation comme dans la section `#contact` —
+ouvre une **modale plein écran** qui pose trois questions, une par écran :
+
+1. **De quoi avez-vous besoin ?** — plusieurs réponses possibles. Cocher
+   *Autre service* fait apparaître un champ libre, alors obligatoire.
+2. **Quelle est l'envergure du projet ?** — une seule réponse.
+3. **Comment on vous contacte ?** — WhatsApp ou e-mail, puis le nom et la
+   coordonnée correspondante.
+
+Rien n'est tapé avant la dernière étape. Un formulaire d'un seul tenant
+demandait sept champs d'un coup, dont deux listes déroulantes ; les mêmes
+questions posées une à une se répondent en trois clics et deux saisies.
+
+Les libellés, options et textes vivent dans `contact.flow` de
+`content/site.ts`. Ces listes servent **aussi à la validation** : une réponse
+dont l'`id` n'y figure pas est refusée. Ce qui est enregistré, en revanche,
+c'est le `label` — changer un libellé plus tard ne réécrit donc pas les
+demandes déjà reçues. Les `id`, eux, sont techniques : les renommer
+invaliderait les demandes en cours de saisie.
+
 Les demandes arrivent dans **`/admin/messages`** — une pastille dans le menu
 compte les non-lues.
 
-**Rien ne part par e-mail.** C'est délibéré : envoyer du courrier depuis le
-site demanderait un service tiers et une clé d'API, donc une configuration de
-plus à maintenir et à surveiller. Le jour où l'attente d'une notification se
-fait sentir, c'est l'ajout à faire — jusque-là, la boîte de réception de
-l'administration suffit et ne peut pas tomber en panne toute seule.
+**Rien ne part par e-mail.** C'est délibéré : notifier demanderait un service
+tiers et une clé d'API, donc une configuration de plus à maintenir et à
+surveiller. Le jour où l'attente d'une notification se fait sentir, c'est
+l'ajout à faire — jusque-là, la boîte de réception de l'administration suffit
+et ne peut pas tomber en panne toute seule.
 
-Un message se lit, se range (*Archiver*) ou se supprime. L'ouvrir le marque lu.
-Le bouton **Répondre par e-mail** ouvre votre logiciel de courrier avec le
-destinataire, l'objet et la salutation déjà remplis : la réponse part de la
-vraie boîte du studio, pas du site.
+Une demande se lit, se range (*Archiver*) ou se supprime. L'ouvrir la marque
+lue. Le bouton de réponse **s'adapte au canal demandé** : *Répondre par
+e-mail* ouvre votre logiciel de courrier, destinataire, objet et salutation
+déjà remplis ; *Répondre sur WhatsApp* ouvre la conversation avec le message
+amorcé. Dans les deux cas la réponse part du studio, pas du site.
 
-Les champs proposés (*type de projet*, *budget*) se règlent dans
-`contact.form` de `content/site.ts`. Ces listes servent **aussi à la
-validation** : une valeur hors liste est refusée. Les réponses sont
-enregistrées telles quelles, donc modifier les listes plus tard ne réécrit pas
-les messages déjà reçus.
+Le bloc `#contact`, tout en bas de l'accueil, se résume à cette invitation :
+une carte sombre avec le message et le bouton, et un grand visuel à côté,
+déposé depuis [Paramètres → CMS](#cms--les-visuels-des-blocs). Les coordonnées
+n'y figurent pas — elles vivent dans le pied de page, et les répéter ici
+affaiblirait le seul geste attendu du visiteur.
 
-**Sans base de données**, le formulaire laisse place aux coordonnées directes —
-les messages n'auraient nulle part où atterrir.
+**Sans base de données**, le bouton laisse place à l'adresse e-mail — les
+demandes n'auraient nulle part où atterrir. C'est aussi le repli **sans
+JavaScript** : le déclencheur est un lien vers `#contact`, détourné au clic
+seulement quand la modale est disponible.
+
+#### Couleurs de la modale
+
+La modale occupe tout l'écran : elle est sa propre pièce et n'emprunte pas la
+palette claire du site. Ses couleurs sont des tokens `--color-shell-*` dans le
+bloc `@theme` de [`app/globals.css`](app/globals.css) — fond `#0A0A0A`, cartes
+`#1A1A1A`, accent `#EC4C79`, un rose un peu plus doux que le rouge framboise du
+site, qui vibre sur fond noir. Pour aligner la modale sur le reste : remplacer
+`--color-shell-accent` par la valeur de `--color-accent`.
 
 #### Ce qui filtre les robots
 
 Trois défenses, aucune ne demandant de clé d'API ni de service extérieur — le
-formulaire marche dès l'installation :
+parcours marche dès l'installation :
 
 | Filtre | Ce qu'il attrape |
 | --- | --- |
 | Champ leurre, invisible à l'écran | Les robots qui remplissent tout le formulaire |
 | Délai minimal de 3 s entre affichage et envoi | Ceux qui exécutent du JavaScript mais vont trop vite |
-| Quota de 3 messages par heure et 8 par jour | Le reste, y compris les envois en rafale |
+| Quota de 3 demandes par heure et 8 par jour | Le reste, y compris les envois en rafale |
 
 Un envoi rejeté par un piège reçoit la **même confirmation** qu'un envoi
 réussi : signaler l'échec ne ferait qu'aider à contourner le piège.
@@ -155,11 +186,33 @@ elle-même n'est jamais enregistrée. Le sel est tiré au sort à la première
 réception et conservé en base (`SiteSettings.contactSalt`) : sans lui,
 l'empreinte d'une IPv4 se remonterait par force brute en quelques minutes.
 
-Le délai n'est vérifié que si le navigateur a posé l'horodatage. Sans
-JavaScript il est absent, et le test ne s'applique pas : refuser dans ce cas
-écarterait des visiteurs légitimes, alors que le quota, lui, rattrape les
-robots qui en profiteraient. Le formulaire fonctionne donc **sans JavaScript**,
-c'est une Server Action posée sur `action`.
+Le délai n'est vérifié que si le navigateur a posé l'horodatage — il est absent
+si le JavaScript n'a pas tourné, et le test ne s'applique alors pas. C'est le
+quota qui rattrape les robots qui en profiteraient.
+
+### Les services en onglets
+
+Six cartes côte à côte se lisaient comme un tarif : l'œil balayait et ne
+retenait rien. Les services sont donc présentés **un à la fois** — une rangée
+de titres, puis l'illustration en grand, la description et les points clés en
+pastilles.
+
+Chaque service porte son **illustration**, déposée depuis sa fiche
+(`/admin/services`). Format conseillé : paysage, 1600 × 1000 px. Sans image, un
+dégradé occupe exactement la même place : la mise en page ne bouge pas au
+moment de la remplacer.
+
+Derrière l'illustration, le titre du service défile en très grand. C'est
+l'animation des logos partenaires (`--animate-marquee`), purement décorative et
+sans JavaScript.
+
+Les **points clés** deviennent des pastilles : garde-les courts, trois ou
+quatre suffisent. Le champ accepte un point par ligne **ou** des virgules.
+
+Tous les panneaux sont dans le HTML, même masqués : un moteur de recherche lit
+les six services, pas seulement le premier. Les onglets suivent le motif ARIA
+habituel — flèches, Origine et Fin déplacent la sélection, et la tabulation
+entre dans le groupe puis en sort.
 
 ### Le carrousel de réalisations
 
@@ -202,6 +255,11 @@ Le troisième onglet des paramètres gère les photos des blocs de l'accueil :
 | --- | --- | --- |
 | Fond de la carte de présentation | La grande carte sombre, avant les services | Paysage large, 2000 × 900 px |
 | Photo de la section « Le studio » | Le portrait à côté du texte de présentation | Portrait, 1000 × 1250 px |
+| Visuel du bloc de contact | Le grand visuel du bas de page, à côté de l'invitation | Paysage, 1600 × 1200 px |
+
+Les illustrations des services, elles, se déposent depuis chaque fiche
+(`/admin/services`) et non ici : elles appartiennent au contenu, pas aux
+réglages.
 
 Même principe que les vignettes du titre : **la mise en page vit dans le code,
 les images en base**. Aucun chemin d'image ne se saisit dans `content/site.ts`.

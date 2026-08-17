@@ -52,6 +52,8 @@ model SiteSettings {
   aboutBannerImage   String?
   /// Portrait ou photo d'équipe de la section « Le studio ».
   aboutStudioImage   String?
+  /// Visuel posé à côté de l'invitation à démarrer un projet.
+  contactImage       String?
 
   /// Sel du hachage des expéditeurs du formulaire de contact (voir Message).
   /// Tiré au sort à la première réception et jamais réaffiché : il vit ici
@@ -197,23 +199,28 @@ model Testimonial {
 /// `published` — rien ici ne s'affiche sur le site — mais un statut de
 /// traitement, qui fait de la boîte de réception une vraie liste de tâches.
 model Message {
-  id          String        @id @default(cuid())
-  name        String
-  email       String
-  phone       String?
-  company     String?
-  /// Type de projet et budget : deux chaînes libres, remplies par le visiteur
-  /// à partir des choix de content/site.ts. Stockées telles quelles pour que
-  /// modifier ces choix plus tard ne réécrive pas l'historique.
-  projectType String?
-  budget      String?
-  body        String
-  status      MessageStatus @default(NEW)
+  id               String        @id @default(cuid())
+  name             String
+  /// Le visiteur choisit son canal : l'un des deux est renseigné, jamais les
+  /// deux. La contrainte « au moins un » est portée par le schéma zod, que
+  /// toute écriture traverse — Postgres ne sait pas l'exprimer simplement.
+  email            String?
+  phone            String?
+  /// Canal demandé, tel qu'il est déclaré dans content/site.ts.
+  preferredContact String
+  /// Besoins cochés à la première étape, et envergure annoncée à la seconde.
+  /// Stockés par leur libellé, pas par leur identifiant : modifier les choix
+  /// proposés plus tard ne doit pas réécrire l'historique.
+  services         String[]
+  scope            String
+  /// Précision libre, saisie quand « Autre service » est coché.
+  body             String?
+  status           MessageStatus @default(NEW)
   /// Empreinte salée de l'adresse IP — jamais l'adresse elle-même. Elle ne
   /// sert qu'à repérer les envois en rafale ; sans le sel, qui vit en base,
   /// elle ne se remonte pas.
-  senderHash  String
-  createdAt   DateTime      @default(now())
+  senderHash       String
+  createdAt        DateTime      @default(now())
 
   @@index([status, createdAt])
   @@index([senderHash, createdAt])

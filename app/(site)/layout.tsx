@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
+import { ContactModalProvider } from "@/components/ContactModalProvider";
 import { Maintenance } from "@/components/Maintenance";
 import { PreviewBanner } from "@/components/PreviewBanner";
 import { getCurrentUser } from "@/lib/auth";
+import { isDatabaseConfigured } from "@/lib/db";
 import { getSettings } from "@/lib/settings";
 
 /**
@@ -30,7 +32,15 @@ export default async function SiteLayout({
 }) {
   const settings = await getSettings();
 
-  if (!settings.maintenanceMode) return children;
+  /* Le parcours de contact s'ouvre depuis la navigation comme depuis la
+     section contact : son état vit donc au-dessus des deux. */
+  const withModal = (content: React.ReactNode) => (
+    <ContactModalProvider available={isDatabaseConfigured()}>
+      {content}
+    </ContactModalProvider>
+  );
+
+  if (!settings.maintenanceMode) return withModal(children);
 
   /* À partir d'ici, le rendu devient dynamique : c'est le prix de la
      prévisualisation, et c'est sans conséquence puisque le site est fermé. */
@@ -38,10 +48,10 @@ export default async function SiteLayout({
 
   if (!user) return <Maintenance settings={settings} />;
 
-  return (
+  return withModal(
     <>
       <PreviewBanner />
       {children}
-    </>
+    </>,
   );
 }

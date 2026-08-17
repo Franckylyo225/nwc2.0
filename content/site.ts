@@ -445,7 +445,6 @@ export const site = {
 
   /* ------------------------------------------------------------- CONTACT */
   contact: {
-    eyebrow: "Contact",
     title: "Un projet en tête ?",
     subtitle:
       "Racontez-nous en deux lignes ce que vous voulez construire. Réponse sous 24 h ouvrées, sans engagement.",
@@ -453,12 +452,7 @@ export const site = {
     email: "hello@nwc-agency.com",
     phone: "+225 07 58 16 09 04",
     address: "Codody, Abidjan",
-    /** Rendez-vous en visio. Mets `null` pour masquer le lien. */
-    booking: {
-      label: "Réserver un appel de 20 minutes",
-      href: "[À REMPLIR — lien Calendly]",
-    },
-    /** Retire les entrées que tu n'utilises pas. */
+    /** Affichés dans le pied de page. Retire les entrées que tu n'utilises pas. */
     socials: [
       { label: "LinkedIn", href: "[À REMPLIR — url LinkedIn]" },
       { label: "Instagram", href: "[À REMPLIR — url Instagram]" },
@@ -467,43 +461,130 @@ export const site = {
     ],
 
     /**
-     * Le formulaire lui-même. Les messages arrivent dans l'administration,
-     * rubrique « Messages » — rien n'est envoyé par e-mail pour l'instant.
+     * Le parcours de contact — trois questions dans une modale plein écran,
+     * ouverte depuis « Démarrer un projet ». Les demandes arrivent dans
+     * l'administration, rubrique « Messages » ; rien ne part par e-mail.
      *
-     * `projectTypes` et `budgets` alimentent les deux listes déroulantes ET la
-     * validation côté serveur : une valeur hors liste est refusée. Les
-     * réponses sont enregistrées telles quelles, donc modifier ces listes plus
-     * tard ne touche pas aux messages déjà reçus.
+     * Les trois listes ci-dessous alimentent l'affichage ET la validation
+     * côté serveur : une réponse dont l'`id` n'y figure pas est refusée. Ce
+     * qui est enregistré, en revanche, c'est le `label` — modifier un libellé
+     * plus tard ne réécrit donc pas les demandes déjà reçues.
      *
-     * Sans base de données configurée, le formulaire laisse place aux
-     * coordonnées directes : le site reste utile avant même la mise en place
-     * de la base.
+     * Les `id` sont des identifiants techniques : les renommer invaliderait
+     * la validation des demandes en cours de saisie. Les `label`, `hint` et
+     * `placeholder` se changent librement.
+     *
+     * Sans base de données configurée, le bouton laisse place aux coordonnées
+     * directes : le site reste utile avant même la mise en place de la base.
      */
-    form: {
-      title: "Parlez-nous de votre projet",
-      submit: "Envoyer le message",
-      /** Affiché à la place du formulaire une fois le message parti. */
-      successTitle: "Message bien reçu",
-      successBody:
-        "Merci — nous revenons vers vous sous 24 h ouvrées. En cas d'urgence, le téléphone reste le plus rapide.",
-      /** Mention sous le bouton. Le lien pointe vers la page de confidentialité. */
-      privacy:
-        "Vos coordonnées servent uniquement à répondre à votre demande.",
-      projectTypes: [
-        "Site vitrine",
-        "Boutique en ligne",
-        "Application ou plateforme web",
-        "Refonte d'un site existant",
-        "Identité de marque",
-        "Autre / je ne sais pas encore",
+    flow: {
+      /** Libellé du bouton qui ouvre la modale, et titre annoncé aux lecteurs d'écran. */
+      open: "Démarrer un projet",
+      label: "Parcours de contact",
+
+      /** Étape 1 — sélection multiple. */
+      needsTitle: "De quoi avez-vous besoin ?",
+      needsHint: "Plusieurs réponses possibles.",
+      /**
+       * Chaque carte porte un libellé et une précision : c'est ce second
+       * niveau qui donne sa matière à la carte, à défaut d'illustration.
+       *
+       * `scopes` reformule les trois envergures de l'étape 2 dans les termes
+       * du besoin coché — « Petit » ne veut pas dire la même chose pour un
+       * site et pour un logo. Garde ces précisions **courtes** : quand deux
+       * besoins sont cochés, elles sont affichées côte à côte.
+       */
+      services: [
+        {
+          id: "site",
+          label: "Site web",
+          hint: "Vitrine, boutique ou refonte",
+          scopes: {
+            small: "Une page, un seul message",
+            medium: "Site vitrine de 5 à 10 pages",
+            large: "Boutique ou plateforme sur-mesure",
+          },
+        },
+        {
+          id: "branding",
+          label: "Logo & Branding",
+          hint: "Identité, charte, déclinaisons",
+          scopes: {
+            small: "Un logo, deux ou trois pistes",
+            medium: "Logo, palette et charte courte",
+            large: "Identité complète et déclinaisons",
+          },
+        },
+        {
+          id: "app",
+          label: "Application mobile",
+          hint: "iOS et Android",
+          scopes: {
+            small: "Maquette ou prototype",
+            medium: "Application de quelques écrans",
+            large: "Comptes, paiement, back-office",
+          },
+        },
+        /* Cocher celui-ci fait apparaître le champ libre ci-dessous. */
+        {
+          id: "autre",
+          label: "Autre service",
+          hint: "Dites-nous en deux mots",
+          scopes: {
+            small: "Intervention ponctuelle",
+            medium: "Mission de quelques semaines",
+            large: "Accompagnement au long cours",
+          },
+        },
       ],
-      budgets: [
-        "Moins de 500 000 FCFA",
-        "500 000 à 1 500 000 FCFA",
-        "1,5 à 3 millions FCFA",
-        "Plus de 3 millions FCFA",
-        "À définir ensemble",
+      otherPlaceholder: "Décrivez votre besoin…",
+
+      /**
+       * Étape 2 — choix unique.
+       *
+       * Les `hint` ci-dessous sont le repli, utilisé quand trois besoins ou
+       * plus sont cochés : les précisions par besoin deviennent alors trop
+       * longues à empiler, et le projet est de toute façon composite.
+       */
+      scopeTitle: "Quelle est l'envergure de votre projet ?",
+      scopeFor: "Pour",
+      scopes: [
+        { id: "small", label: "Petit", hint: "Landing page, logo, projet simple" },
+        { id: "medium", label: "Moyen", hint: "Site multi-pages, identité complète" },
+        { id: "large", label: "Grand", hint: "Plateforme, application, projet sur-mesure" },
       ],
+
+      /** Étape 3 — choix unique, puis coordonnée correspondante. */
+      contactTitle: "Comment on vous contacte ?",
+      namePlaceholder: "Votre nom",
+      channels: [
+        {
+          id: "whatsapp",
+          label: "WhatsApp / Appel",
+          hint: "Le plus rapide",
+          field: "Votre numéro",
+          placeholder: "+225 07 XX XX XX XX",
+        },
+        {
+          id: "email",
+          label: "Email",
+          hint: "Pour un échange écrit",
+          field: "Votre adresse e-mail",
+          placeholder: "votre@email.com",
+        },
+      ],
+
+      next: "Continuer",
+      back: "Retour",
+      submit: "Envoyer",
+
+      /** Écran de confirmation. `{canal}` est remplacé par le canal choisi. */
+      doneTitle: "Merci ! On revient vers vous très vite.",
+      doneBody: "Notre équipe vous contactera sous 24 h par {canal}.",
+      close: "Fermer",
+
+      /** Mention de bas de modale. Le lien pointe vers la page de confidentialité. */
+      privacy: "Vos coordonnées servent uniquement à répondre à votre demande.",
     },
   },
 

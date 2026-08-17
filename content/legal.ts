@@ -157,9 +157,9 @@ Deux régimes se superposent, et nous appliquons le plus protecteur des deux à 
 
 ### 3.1 Lorsque vous nous écrivez
 
-Si vous nous contactez par le **formulaire du site**, par courriel ou par téléphone, nous traitons les données que vous nous transmettez de vous-même : nom, adresse électronique, numéro de téléphone, nom de votre organisation, type de projet et budget envisagés, et le contenu de votre message.
+Si vous nous contactez par le **formulaire du site**, par courriel ou par téléphone, nous traitons les données que vous nous transmettez de vous-même : nom, adresse électronique **ou** numéro de téléphone selon le moyen de rappel que vous choisissez, nature et envergure du projet envisagé, et, le cas échéant, la précision que vous saisissez librement.
 
-Les seuls champs obligatoires du formulaire sont le nom, l'adresse électronique et le message ; les autres restent à votre appréciation.
+Le formulaire ne demande **qu'une seule coordonnée** : celle du canal par lequel vous souhaitez être recontacté. Nous ne collectons pas l'autre.
 
 - **Finalité** : répondre à votre demande, établir un devis, assurer le suivi de la relation commerciale.
 - **Base légale** : votre démarche elle-même — mesures précontractuelles prises à votre demande, puis exécution du contrat s'il est conclu (art. 6.1.b du RGPD).
