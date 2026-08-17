@@ -180,11 +180,19 @@ export function SettingsForm({
           </span>
         </label>
 
+        {/* `inert` et non `disabled` : un groupe désactivé n'envoie pas ses
+            champs, si bien que décocher le mode maintenance les faisait
+            disparaître du formulaire — et le schéma, qui les attend, refusait
+            l'enregistrement. Le mode ne pouvait alors plus être coupé.
+
+            `inert` retire le groupe du clic, du focus et des lecteurs d'écran
+            sans toucher à l'envoi : les textes de la page d'attente repartent
+            donc tels quels et survivent à une désactivation. */}
         <fieldset
-          disabled={!active}
+          inert={!active}
           className={cx(
             "flex flex-col gap-7 transition-opacity",
-            !active && "pointer-events-none opacity-45",
+            !active && "opacity-45",
           )}
         >
           <div className="flex flex-col gap-2">

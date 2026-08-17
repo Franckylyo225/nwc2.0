@@ -6,9 +6,15 @@ import { site } from "@/content/site";
  * serveur. Les messages sont en français : ils sont affichés tels quels.
  */
 
+/**
+ * Le message d'erreur de type couvre le champ *absent* autant que le champ
+ * vide : un contrôle désactivé, ou retiré du DOM, ne part pas avec le
+ * formulaire, et zod annonce alors « expected string, received undefined » —
+ * un message qui ne nomme même pas le champ fautif.
+ */
 const text = (label: string, max = 500) =>
   z
-    .string()
+    .string({ error: `${label} est obligatoire.` })
     .trim()
     .min(1, `${label} est obligatoire.`)
     .max(max, `${label} dépasse ${max} caractères.`);
@@ -124,7 +130,7 @@ export const articleSchema = z.object({
   author: optionalText,
   published,
   publishedAt: z
-    .string()
+    .string({ error: "Date de publication invalide." })
     .trim()
     .transform((value) => (value === "" ? null : new Date(value)))
     .nullable()
@@ -148,7 +154,7 @@ export const settingsSchema = z.object({
   maintenanceTitle: text("Le titre", 120),
   maintenanceMessage: text("Le message", 600),
   maintenanceEta: z
-    .string()
+    .string({ error: "Date d'ouverture invalide." })
     .trim()
     .transform((value) => (value === "" ? null : new Date(value)))
     .nullable()
