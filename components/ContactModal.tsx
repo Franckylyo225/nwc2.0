@@ -171,8 +171,11 @@ export function ContactModal({ onClose }: { onClose: () => void }) {
             action={formAction}
             className="flex flex-1 flex-col justify-center py-10"
           >
-            {/* Réponses des étapes précédentes : le parcours est en trois
+            {/* Toutes les réponses, y compris celles saisies à l'écran : les
+                champs visibles sont pilotés par React et n'ont pas de `name`,
+                ils ne partent donc pas d'eux-mêmes. Le parcours tient en trois
                 écrans, l'envoi en une seule requête. */}
+            <input type="hidden" name="name" value={answers.nom} />
             <input type="hidden" name="services" value={answers.services.join(",")} />
             <input type="hidden" name="scope" value={answers.envergure} />
             <input type="hidden" name="preferredContact" value={answers.contactMethod} />
