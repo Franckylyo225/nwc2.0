@@ -48,11 +48,21 @@ export function TrustedBy() {
                   alt={logo.name}
                   width={logo.width}
                   height={logo.height}
-                  /* Logos affichés dans leurs couleurs de marque : en niveaux
-                     de gris, le jaune d'ADA et les logos clairs disparaissent.
-                     Pour un rendu plus sobre, ajouter `grayscale
-                     hover:grayscale-0`. */
-                  className="max-h-full w-auto max-w-full object-contain opacity-80 transition duration-300 ease-smooth hover:opacity-100"
+                  /* Niveaux de gris au repos, couleurs de marque au survol.
+                     Huit logos aux chartes sans rapport formaient une ligne
+                     bariolée qui tirait l'œil plus que le reste de la page ;
+                     dégrisés un par un, ils redeviennent lisibles sans voler
+                     la vedette.
+
+                     Le survol met aussi l'animation en pause (voir la liste
+                     ci-dessus) : le logo reste sous le curseur le temps qu'on
+                     le regarde.
+
+                     Contrepartie assumée : un logo dont toute l'identité tient
+                     dans sa couleur — le jaune d'ADA — perd son repère au
+                     repos. Pour revenir aux couleurs permanentes, retirer
+                     `grayscale` et `hover:grayscale-0`. */
+                  className="max-h-full w-auto max-w-full object-contain opacity-70 grayscale transition duration-300 ease-smooth hover:opacity-100 hover:grayscale-0"
                 />
               </li>
             ))}

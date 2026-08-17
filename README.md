@@ -364,6 +364,14 @@ en ajouter un : dépose le fichier, ajoute une entrée avec ses dimensions
 réelles. Fond transparent recommandé, 800 px de large suffisent — le bandeau les
 normalise à hauteur égale.
 
+Ils sont affichés **en niveaux de gris**, et reprennent leurs couleurs de marque
+au survol — le défilement se met alors en pause. Huit chartes sans rapport
+formaient sinon une ligne bariolée qui tirait l'œil plus que le reste de la
+page. Contrepartie : un logo dont toute l'identité tient dans sa couleur perd
+son repère au repos. Pour revenir aux couleurs permanentes, retirer `grayscale`
+et `hover:grayscale-0` dans
+[`components/TrustedBy.tsx`](components/TrustedBy.tsx).
+
 ## Changer les couleurs et la typographie
 
 Tout est centralisé dans le bloc `@theme` de [`app/globals.css`](app/globals.css) :

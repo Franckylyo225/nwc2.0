@@ -19,7 +19,11 @@ export function AboutBanner({ image }: { image: string | null }) {
     <section className="pt-8 sm:pt-12">
       <div className="shell">
         <Reveal>
-          <div className="relative isolate flex min-h-[28rem] flex-col justify-between overflow-hidden rounded-card bg-ink p-8 text-white sm:p-12 lg:min-h-[34rem] lg:p-14">
+          {/* La hauteur plancher suit la largeur : à 28 rem sur un téléphone,
+              elle imposait un vide sous le logo avant même que le texte ne
+              commence. Le rembourrage descend aussi — 2 rem de chaque côté sur
+              un écran de 375 px, c'est un sixième de la largeur perdu. */}
+          <div className="relative isolate flex min-h-[20rem] flex-col justify-between overflow-hidden rounded-card bg-ink p-6 text-white sm:min-h-[28rem] sm:p-12 lg:min-h-[34rem] lg:p-14">
             {image ? (
               /* Décorative : le sens est porté par le titre et le paragraphe
                  posés par-dessus, d'où un `alt` vide. */
@@ -40,20 +44,26 @@ export function AboutBanner({ image }: { image: string | null }) {
               className="absolute inset-0 -z-10 bg-gradient-to-tr from-ink via-ink/85 to-ink/45"
             />
 
-            <p className="flex items-center gap-3">
-              <BrandMark className="size-7 shrink-0" />
-              <span className="display text-2xl tracking-tight">
+            <p className="flex items-center gap-2.5 sm:gap-3">
+              <BrandMark className="size-6 shrink-0 sm:size-7" />
+              <span className="display text-xl tracking-tight sm:text-2xl">
                 {brand.short}
               </span>
               <span className="sr-only">{brand.name}</span>
             </p>
 
-            <div className="mt-16 grid gap-10 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
+            <div className="mt-10 grid gap-8 sm:mt-14 sm:gap-10 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
               <div>
-                <h2 className="display max-w-3xl text-3xl sm:text-4xl lg:text-5xl">
+                {/* L'interlignage d'affichage (0.98) est calibré pour un titre
+                    d'une ou deux lignes. Sur un téléphone celui-ci en fait
+                    quatre : il faut le desserrer, sinon les lignes se touchent. */}
+                <h2 className="display max-w-3xl text-[1.75rem] leading-[1.08] sm:text-4xl sm:leading-[0.98] lg:text-5xl">
                   {aboutBanner.title}
                 </h2>
-                <p className="mt-6 max-w-3xl text-lg leading-relaxed text-white/70">
+                {/* Ce paragraphe fait près de 500 signes. À 18 px dans une
+                    colonne de 270 px, il occupait une trentaine de lignes : on
+                    revient au corps de texte courant tant qu'on est étroit. */}
+                <p className="mt-4 max-w-3xl leading-relaxed text-white/70 sm:mt-6 sm:text-lg">
                   {aboutBanner.text}
                 </p>
               </div>
@@ -92,11 +102,11 @@ function StatCarousel() {
         {stats.map((stat) => (
           <article
             key={stat.caption}
-            className="rounded-[1rem] bg-white p-6 text-ink shadow-[0_28px_64px_-40px_rgba(16,17,20,0.7)]"
+            className="rounded-[1rem] bg-white p-5 text-ink shadow-[0_28px_64px_-40px_rgba(16,17,20,0.7)] sm:p-6"
           >
             <p className="flex items-baseline gap-1.5">
-              <span className="display text-5xl">{stat.value}</span>
-              <span className="text-lg text-muted">{stat.unit}</span>
+              <span className="display text-4xl sm:text-5xl">{stat.value}</span>
+              <span className="text-base text-muted sm:text-lg">{stat.unit}</span>
             </p>
             <p className="mt-3 text-sm leading-snug text-muted">
               {stat.caption}
