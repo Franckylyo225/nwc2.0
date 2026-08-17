@@ -511,6 +511,26 @@ npm run db:deploy
 >
 > Une valeur mal formée est signalée dans les journaux de build et ignorée : le
 > déploiement se poursuit tant qu'au moins une des deux est exploitable.
+>
+> **Colle la chaîne telle que Neon la donne**, `?sslmode=require` compris : le
+> mode SSL est réécrit en `verify-full` à la lecture (voir ci-dessous). Rien à
+> ajuster à la main.
+
+#### Pourquoi `sslmode` est réécrit
+
+Neon livre une chaîne terminée par `?sslmode=require`. La bibliothèque `pg`
+la traite **déjà** comme `verify-full`, mais avertit à chaque démarrage qu'elle
+adoptera la sémantique libpq à sa prochaine version majeure — où `require`
+chiffre sans vérifier le certificat. En développement, cet avertissement remonte
+dans l'overlay de Next, déguisé en erreur.
+
+[`lib/database-url.ts`](lib/database-url.ts) écrit donc `verify-full` noir sur
+blanc à la lecture de la variable. Le comportement d'aujourd'hui est inchangé :
+il est simplement gravé, et une mise à jour de `pg` ne pourra pas affaiblir la
+connexion sans qu'on l'ait décidé.
+
+Seuls `prefer`, `require` et `verify-ca` sont concernés. Un `sslmode=disable`
+explicite est laissé tel quel — c'est un choix, pas un défaut d'origine.
 
 Pour obtenir les valeurs exactes, prêtes à coller :
 

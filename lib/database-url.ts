@@ -17,6 +17,31 @@
 
 const SCHEMES = /^postgres(ql)?:\/\//;
 
+/**
+ * Modes SSL que `pg` traite aujourd'hui comme des synonymes de `verify-full`,
+ * en prévenant qu'il cessera de le faire.
+ */
+const SSL_ALIASES = /([?&]sslmode=)(prefer|require|verify-ca)(?=&|$)/i;
+
+/**
+ * Fixe explicitement le mode SSL que `pg` applique déjà.
+ *
+ * Neon — comme la plupart des hébergeurs — livre une chaîne terminée par
+ * `?sslmode=require`. `pg` la traite comme `verify-full`, mais avertit à
+ * chaque démarrage qu'il adoptera la sémantique libpq à sa prochaine version
+ * majeure, où `require` chiffre sans vérifier le certificat. L'avertissement
+ * remonte alors dans l'overlay de Next, déguisé en erreur.
+ *
+ * Écrire `verify-full` noir sur blanc ne change donc rien au comportement
+ * actuel : cela le grave, et la mise à jour de `pg` ne pourra pas affaiblir
+ * la connexion sans qu'on l'ait décidé. La réécriture porte sur le seul
+ * paramètre de la requête, sans reconstruire l'URL — un mot de passe aux
+ * caractères exotiques ne doit pas être ré-encodé au passage.
+ */
+function pinSslMode(url: string) {
+  return url.replace(SSL_ALIASES, "$1verify-full");
+}
+
 /** Valeur nettoyée d'une variable, ou `undefined` si elle est absente ou vide. */
 export function readDatabaseUrl(name: string): string | undefined {
   const raw = process.env[name];
@@ -52,7 +77,7 @@ export function optionalDatabaseUrl(...names: string[]): string | undefined {
       console.warn(`⚠ ${describe(name, url)} Variable ignorée.`);
       continue;
     }
-    return url;
+    return pinSslMode(url);
   }
   return undefined;
 }
