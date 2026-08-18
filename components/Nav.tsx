@@ -35,8 +35,12 @@ export function Nav() {
       )}
     >
       <nav className="shell flex h-18 items-center justify-between gap-6 py-4">
+        {/* Vers l'accueil, et non vers `#top` : une ancre ne quitte pas la page
+            courante, si bien que depuis le blog ou une page légale le logo ne
+            faisait rien. Sur l'accueil, la navigation ramène en haut, ce qui
+            était déjà le comportement attendu. */}
         <Link
-          href="#top"
+          href="/"
           className="group flex items-center gap-2.5"
           onClick={() => setOpen(false)}
         >
