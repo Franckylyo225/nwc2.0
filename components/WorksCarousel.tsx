@@ -18,15 +18,12 @@ import { cx } from "./ui";
 export function WorksCarousel({
   children,
   backdrops,
-  header,
   count,
   label,
 }: {
   children: ReactNode;
   /** Un décor par projet, rendu côté serveur ; seul l'affiché est opaque. */
   backdrops: ReactNode[];
-  /** Titre de la section : il vit sous les décors, donc à l'intérieur d'ici. */
-  header: ReactNode;
   count: number;
   label: string;
 }) {
@@ -79,8 +76,6 @@ export function WorksCarousel({
           </div>
         ))}
       </div>
-
-      <div className="relative">{header}</div>
 
       <div className="relative">
         <div

@@ -3,6 +3,7 @@ import Link from "next/link";
 import { site } from "@/content/site";
 import type { WorkItem } from "@/lib/content";
 import { Reveal } from "./Reveal";
+import { Wordmark } from "./Wordmark";
 import { WorksCarousel } from "./WorksCarousel";
 import { ArrowUpRight, cx } from "./ui";
 
@@ -31,46 +32,48 @@ export function Works({ items }: { items: WorkItem[] }) {
   if (items.length === 0) return null;
 
   return (
-    /* `relative` sert de repère aux décors : ils sont posés par le carrousel
-       mais doivent couvrir la section entière, titre compris.
-       `overflow-hidden` retient le débord du flou. */
-    <section
-      id="realisations"
-      className="relative overflow-hidden bg-ink py-20 text-white sm:py-24"
-    >
-      <WorksCarousel
-        count={items.length}
-        label={works.title}
-        /* Les décors sont rendus côté serveur et seulement permutés par le
-           carrousel : `next/image` reste hors du bundle client. */
-        backdrops={items.map((work, i) => (
-          <Backdrop key={work.id} image={work.image} index={i} />
-        ))}
-        header={
-          <Reveal className="shell mb-12 flex flex-col gap-5">
-            <span className="inline-flex w-fit items-center gap-2 rounded-pill bg-white/10 px-3.5 py-1.5 text-xs font-medium uppercase tracking-[0.14em] text-accent">
-              <span aria-hidden className="size-1.5 rounded-full bg-accent" />
-              {works.eyebrow}
-            </span>
-            <h2 className="display text-4xl sm:text-5xl lg:text-[3.5rem]">
-              {works.title}
-            </h2>
-          </Reveal>
-        }
+    <>
+      {/* En-tête posé sur le fond clair de la page : la pastille, puis le titre
+          en très grand que le bord de la section sombre vient trancher. */}
+      <Reveal className="shell pt-16 text-ink sm:pt-20">
+        <p className="mb-6 text-center text-sm text-muted">({works.eyebrow})</p>
+        <Wordmark id="works" text={works.title} />
+      </Reveal>
+
+      {/* `relative` sert de repère aux décors : ils sont posés par le carrousel
+          mais doivent couvrir la section entière. `overflow-hidden` retient le
+          débord du flou. */}
+      <section
+        id="realisations"
+        className="relative overflow-hidden bg-ink py-20 text-white sm:py-24"
       >
-        {items.map((work, i) => (
-          <WorkSlide
-            key={work.id}
-            work={work}
-            index={i}
-            total={items.length}
-            /* Seule la première fiche est visible au chargement : les autres
-               attendent qu'on les fasse défiler pour charger leur visuel. */
-            priority={i === 0}
-          />
-        ))}
-      </WorksCarousel>
-    </section>
+        {/* Le titre visible est décoratif : l'ossature du document a tout de
+            même besoin du sien, sans quoi la section n'aurait pas de nom. */}
+        <h2 className="sr-only">{works.title}</h2>
+
+        <WorksCarousel
+          count={items.length}
+          label={works.title}
+          /* Les décors sont rendus côté serveur et seulement permutés par le
+             carrousel : `next/image` reste hors du bundle client. */
+          backdrops={items.map((work, i) => (
+            <Backdrop key={work.id} image={work.image} index={i} />
+          ))}
+        >
+          {items.map((work, i) => (
+            <WorkSlide
+              key={work.id}
+              work={work}
+              index={i}
+              total={items.length}
+              /* Seule la première fiche est visible au chargement : les autres
+                 attendent qu'on les fasse défiler pour charger leur visuel. */
+              priority={i === 0}
+            />
+          ))}
+        </WorksCarousel>
+      </section>
+    </>
   );
 }
 
