@@ -10,13 +10,19 @@ import { site } from "@/content/site";
  * sous les yeux en permanence, et deux boutons identiques à l'écran se
  * concurrenceraient.
  *
- * `pb-[env(safe-area-inset-bottom)]` le remonte au-dessus de la barre
- * d'accueil des iPhone récents, sans quoi le bas du bouton passe dessous.
+ * C'est une bannière et non un bouton posé dans une barre : elle occupe toute
+ * la largeur, sans marge ni arrondi, et porte la couleur d'accent. Sur un
+ * écran de téléphone, c'est la forme qui reste lisible d'un coup d'œil et la
+ * plus facile à atteindre au pouce.
+ *
+ * Le rembourrage bas absorbe `env(safe-area-inset-bottom)` : la couleur
+ * descend ainsi jusqu'au bord de l'écran sur les iPhone récents, tandis que le
+ * texte reste au-dessus de la barre d'accueil.
  */
 export function MobileCta() {
   return (
-    <div className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-bg/90 px-4 pb-[max(0.75rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-xl sm:hidden">
-      <ContactTrigger className="flex w-full items-center justify-center gap-2 rounded-pill bg-ink px-6 py-3.5 text-sm font-medium text-white transition-colors active:bg-accent">
+    <div className="fixed inset-x-0 bottom-0 z-40 shadow-[0_-12px_30px_-18px_rgba(16,17,20,0.45)] sm:hidden">
+      <ContactTrigger className="flex w-full items-center justify-center gap-2 bg-accent px-6 pb-[max(1rem,env(safe-area-inset-bottom))] pt-4 text-sm font-medium text-white transition-colors active:bg-accent-hover">
         {site.nav.cta.label}
         <ArrowUpRight />
       </ContactTrigger>
