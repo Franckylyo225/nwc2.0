@@ -67,11 +67,11 @@ const mentionsLegales: LegalDocument = {
 Le présent site est édité par :
 
 - **Dénomination sociale** : ${brand.name}
-- **Forme juridique** : [À REMPLIR — ex. SARL, SAS, SASU, entreprise individuelle]
-- **Capital social** : [À REMPLIR — ex. 1 000 000 FCFA]
+- **Forme juridique** : SARL
+- **Capital social** : 1 000 000 FCFA
 - **Siège social** : ${contact.address}, ${brand.country}
-- **RCCM** : [À REMPLIR — numéro d'immatriculation au Registre du Commerce et du Crédit Mobilier, ex. CI-ABJ-2024-B-12345]
-- **Compte contribuable** : [À REMPLIR — numéro d'identification fiscale]
+- **RCCM** : CI-ABJ-03-2022-B12-04941
+- **Compte contribuable** : 2243543Q
 - **Téléphone** : ${contact.phone}
 - **Adresse électronique** : [${contact.email}](mailto:${contact.email})
 
@@ -268,8 +268,7 @@ Les frais de tiers nécessaires au projet — nom de domaine, hébergement, lice
 
 Sauf stipulation contraire du devis, le règlement s'effectue selon l'échéancier suivant :
 
-- **[À REMPLIR — ex. 40 %]** à la commande, à titre d'acompte ;
-- **[À REMPLIR — ex. 30 %]** à la validation de la maquette ou de l'étape intermédiaire prévue au devis ;
+- **50%** à la commande, à titre d'acompte ;
 - le solde à la livraison, avant mise en ligne.
 
 Les paiements se font par **[À REMPLIR — ex. virement bancaire, Wave, Orange Money]**, à **[À REMPLIR — ex. 30 jours]** date de facture pour les échéances autres que l'acompte.
@@ -282,7 +281,7 @@ La qualité et le respect du calendrier dépendent directement de la collaborati
 
 - désigner un interlocuteur unique, habilité à valider les étapes du projet ;
 - fournir en temps utile les contenus nécessaires — textes, images, logos, accès techniques — dans les formats convenus ;
-- répondre aux demandes de validation dans un délai de **[À REMPLIR — ex. 5 jours ouvrés]** ;
+- répondre aux demandes de validation dans un délai de ** 3 jours ouvrés** ;
 - garantir qu'il détient les droits sur les éléments qu'il transmet.
 
 Le Client garantit le Prestataire contre toute réclamation d'un tiers relative aux contenus qu'il a fournis.
@@ -297,7 +296,7 @@ Un retard raisonnable ne peut donner lieu ni à annulation de la commande, ni à
 
 À l'achèvement des travaux, le Prestataire met les livrables à disposition du Client pour recette.
 
-Le Client dispose de **[À REMPLIR — ex. 10 jours ouvrés]** pour notifier par écrit les non-conformités constatées au regard du devis. Passé ce délai, ou en cas de mise en exploitation des livrables par le Client, la recette est réputée acquise sans réserve.
+Le Client dispose de **10 jours ouvrés** pour notifier par écrit les non-conformités constatées au regard du devis. Passé ce délai, ou en cas de mise en exploitation des livrables par le Client, la recette est réputée acquise sans réserve.
 
 Les corrections de non-conformités sont réalisées sans frais. Les demandes d'évolution formulées à ce stade relèvent de l'article 2.
 

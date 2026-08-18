@@ -3,6 +3,7 @@ import { site } from "@/content/site";
 import { isDatabaseConfigured } from "@/lib/db";
 import { ContactTrigger } from "./ContactTrigger";
 import { Reveal } from "./Reveal";
+import { Wordmark } from "./Wordmark";
 import { ArrowUpRight } from "./ui";
 
 const { contact } = site;
@@ -21,7 +22,17 @@ const { contact } = site;
 export function Contact({ image }: { image: string | null }) {
   return (
     <section id="contact" className="py-20 sm:py-28">
-      <div className="shell">
+      <div className="shell overflow-hidden">
+        {/* Même bandeau qu'ailleurs : il se dissout au-dessus des deux cartes
+            plutôt que de leur servir de titre. Le vrai titre est dans la carte
+            sombre, où il porte l'invitation. */}
+        <Reveal>
+          <Wordmark
+            text={contact.wordmark}
+            className="mb-6 text-[clamp(3rem,14vw,13rem)]"
+          />
+        </Reveal>
+
         <Reveal>
           <div className="grid gap-4 lg:grid-cols-[minmax(0,24rem)_1fr] lg:gap-5">
             <Invitation />

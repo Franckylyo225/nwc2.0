@@ -445,6 +445,9 @@ export const site = {
 
   /* ------------------------------------------------------------- CONTACT */
   contact: {
+    /* Posé en très grand au-dessus du bloc, il s'y dissout. Garde-le court :
+       c'est sa largeur, pas sa taille, qui le fait tenir dans la colonne. */
+    wordmark: "Let's Connect",
     title: "Un projet en tête ?",
     subtitle:
       "Racontez-nous en deux lignes ce que vous voulez construire. Réponse sous 24 h ouvrées, sans engagement.",
