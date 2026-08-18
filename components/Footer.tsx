@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { site } from "@/content/site";
+import { MobileCta } from "./MobileCta";
 import { Wordmark } from "./Wordmark";
 import { ArrowUpRight } from "./ui";
 
@@ -7,9 +8,12 @@ const { footer, brand, contact } = site;
 
 export function Footer() {
   return (
-    /* `overflow-hidden` sert au bandeau du bas, qui déborde volontairement. */
+    /* `overflow-hidden` sert au bandeau du bas, qui déborde volontairement.
+       Le pied de page est le seul élément commun à toutes les pages publiques :
+       c'est donc lui qui porte le bouton fixe du mobile. */
     <footer className="overflow-hidden border-t border-line bg-surface/60">
-      <div className="shell pb-10 pt-16 sm:pb-12 sm:pt-20">
+      <MobileCta />
+      <div className="shell pb-28 pt-16 sm:pb-12 sm:pt-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Marque */}
           <div className="flex flex-col gap-5">
