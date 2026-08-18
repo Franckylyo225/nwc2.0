@@ -9,7 +9,7 @@ export function Footer() {
   return (
     /* `overflow-hidden` sert au bandeau du bas, qui déborde volontairement. */
     <footer className="overflow-hidden border-t border-line bg-surface/60">
-      <div className="shell pt-16 sm:pt-20">
+      <div className="shell pb-10 pt-16 sm:pb-12 sm:pt-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Marque */}
           <div className="flex flex-col gap-5">
@@ -83,11 +83,14 @@ export function Footer() {
           </a>
         </div>
 
-        {/* Dernière chose de la page. La marge négative fait passer le bas des
-            lettres sous le bord du pied de page, que l'`overflow-hidden`
-            tranche : le mot semble continuer au-delà de l'écran. Le dégradé
-            l'éteint avant, pour que la coupe ne se lise pas comme un défaut. */}
-        <Wordmark text={brand.name} className="-mb-[0.3em] mt-12 sm:mt-16" />
+        {/* Dernière chose de la page, et la seule des trois à n'être pas
+            tranchée : c'est le nom du studio, il doit se lire en entier. Le
+            dégradé reste, mais s'arrête avant la transparence complète — assez
+            pour poser une ombre sous le mot, pas assez pour l'effacer. */}
+        <Wordmark
+          text={brand.name}
+          className="mt-12 from-ink/40 via-ink/26 to-ink/8 sm:mt-16"
+        />
       </div>
     </footer>
   );
