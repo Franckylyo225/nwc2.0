@@ -107,7 +107,9 @@ function Squiggle() {
  */
 function Visual({ image }: { image: string | null }) {
   return (
-    <div className="relative aspect-4/3 overflow-hidden rounded-[1.75rem] bg-surface-2 sm:aspect-16/10 lg:aspect-auto lg:min-h-[26rem]">
+    /* `isolate` enferme les fusions de calques ci-dessous : sans lui, le
+       `mix-blend-multiply` de la teinte déborderait sur le fond de la page. */
+    <div className="relative isolate aspect-4/3 overflow-hidden rounded-[1.75rem] bg-surface-2 sm:aspect-16/10 lg:aspect-auto lg:min-h-[26rem]">
       {image ? (
         <Image
           src={image}
@@ -117,8 +119,26 @@ function Visual({ image }: { image: string | null }) {
           className="object-cover"
         />
       ) : (
-        <div className="size-full bg-gradient-to-br from-accent/25 via-surface-2 to-surface" />
+        <div className="size-full bg-gradient-to-br from-accent/30 via-surface-2 to-surface" />
       )}
+
+      {/* Teinte de marque, en deux voiles.
+
+          Le premier pose l'accent en bas à gauche, du côté de la carte, et
+          s'efface vers le haut. Il est en `multiply` et non posé à plat : la
+          couleur entre alors dans les ombres de la photo au lieu de la
+          recouvrir d'un film uniforme, et les blancs restent blancs.
+
+          Le second assombrit les angles à l'encre du site, ce qui referme le
+          cadre et empêche une photo claire de se dissoudre dans la page. */}
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-tr from-accent/65 via-accent/15 to-transparent mix-blend-multiply"
+      />
+      <div
+        aria-hidden
+        className="pointer-events-none absolute inset-0 bg-gradient-to-b from-ink/30 via-transparent to-ink/35"
+      />
     </div>
   );
 }
