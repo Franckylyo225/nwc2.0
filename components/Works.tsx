@@ -5,7 +5,7 @@ import type { WorkItem } from "@/lib/content";
 import { Reveal } from "./Reveal";
 import { Wordmark } from "./Wordmark";
 import { WorksCarousel } from "./WorksCarousel";
-import { ArrowUpRight, cx } from "./ui";
+import { ArrowUpRight, Eyebrow, cx } from "./ui";
 
 const { works } = site;
 
@@ -36,7 +36,11 @@ export function Works({ items }: { items: WorkItem[] }) {
       {/* En-tête posé sur le fond clair de la page : la pastille, puis le titre
           en très grand que le bord de la section sombre vient trancher. */}
       <Reveal className="shell overflow-hidden pt-16 sm:pt-20">
-        <p className="mb-6 text-center text-sm text-muted">({works.eyebrow})</p>
+        {/* La même pastille que les autres sections, simplement centrée : le
+            bandeau qu'elle annonce l'est aussi. */}
+        <div className="mb-6 flex justify-center">
+          <Eyebrow>{works.eyebrow}</Eyebrow>
+        </div>
         {/* Deux mots de moins que le nom de la marque : le corps peut monter
             sans que la ligne déborde de la colonne. */}
         <Wordmark

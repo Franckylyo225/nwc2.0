@@ -314,22 +314,22 @@ export const site = {
   /* --------------------------------------------------------------- STUDIO */
   about: {
     eyebrow: "Le studio",
-    title: "Une nouvelle vague de conception web",
+    title: "#NWC",
     /** Chaque entrée = un paragraphe. */
     paragraphs: [
-      "[À REMPLIR — présente le studio : qui tu es, depuis quand, pour qui tu travailles. Deux ou trois phrases suffisent, écrites simplement.]",
-      "[À REMPLIR — ta manière de travailler et ce qui te distingue : proximité, délais, expertise technique, accompagnement dans la durée…]",
+      "Depuis Abidjan, New Wave Conception conçoit des sites web, des plateformes et des identités digitales pour les entreprises et institutions les plus exigeantes de Côte d'Ivoire et d'Afrique de l'Ouest. Plus de 80 clients nous font confiance pour donner vie à leurs ambitions digitales.",
+      "Chaque projet est suivi personnellement par le fondateur, de la première maquette à la mise en ligne. Pas de sous-traitance, pas de surprises — un interlocuteur unique, des délais tenus et une exigence technique à la hauteur de votre marque.",
     ],
     /* La photo du fondateur / de l'équipe se dépose depuis l'administration
        (Paramètres → CMS). */
     signature: {
       name: "Franck TCHETEHO",
-      role: "Fondateur, New Wave Conception",
+      role: "co-Fondateur, New Wave Conception",
     },
     highlights: [
       { value: "+80", label: "clients accompagnés" },
-      { value: "5 semaines", label: "délai moyen de livraison" },
-      { value: "100 %", label: "des projets suivis par le fondateur" },
+      { value: "+10 ans", label: "d'expérience dans le digital" },
+      { value: "72h", label: "pour votre première maquette" },
     ],
   },
 
@@ -422,7 +422,7 @@ export const site = {
       },
       {
         q: "Comment se passe le paiement ?",
-        a: "[À REMPLIR — ex. 40 % à la commande, le solde à la mise en ligne. Paiement en 3 fois possible.]",
+        a: "50 % à la commande, le solde à la mise en ligne. Paiement en 3 fois possible.",
       },
       {
         q: "Puis-je modifier mon site moi-même ensuite ?",
@@ -434,11 +434,11 @@ export const site = {
       },
       {
         q: "L'hébergement et le nom de domaine sont-ils compris ?",
-        a: "[À REMPLIR — précise ce que tu prends en charge : achat du domaine, hébergement la première année, ou simple accompagnement.]",
+        a: "Pas par défaut, mais nous pouvons tout à fait inclure l'hébergement et l'enregistrement de votre nom de domaine dans le devis si vous le souhaitez. C'est particulièrement pratique si vous démarrez de zéro — on s'occupe de tout pour que vous n'ayez à gérer aucun aspect technique.",
       },
       {
         q: "Travaillez-vous avec des clients hors de votre région ?",
-        a: "Oui, l'essentiel se fait en visio et par e-mail. Nous accompagnons des clients partout en France, et à l'étranger sur demande.",
+        a: "Oui, l'essentiel se fait en visio et par e-mail. Nous accompagnons des clients partout en France et au Canada, et à l'étranger sur demande.",
       },
     ],
   },

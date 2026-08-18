@@ -89,7 +89,7 @@ export function Footer() {
             pour poser une ombre sous le mot, pas assez pour l'effacer. */}
         <Wordmark
           text={brand.name}
-          className="mt-12 from-ink/40 via-ink/26 to-ink/8 sm:mt-16"
+          className="mt-12 text-[clamp(2rem,8.4vw,7.9rem)] from-ink/40 via-ink/26 to-ink/8 sm:mt-16"
         />
       </div>
     </footer>
