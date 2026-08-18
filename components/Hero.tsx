@@ -72,7 +72,10 @@ export function Hero({
 
               {part.imageSlot ? (
                 <span className="rise inline-block" style={delay(i + 1.5)}>
-                  <HeadlineVignette src={images[part.imageSlot] ?? null} />
+                  <HeadlineVignette
+                    src={images[part.imageSlot] ?? null}
+                    slot={part.imageSlot}
+                  />
                 </span>
               ) : null}
             </span>
@@ -138,21 +141,26 @@ export function Hero({
  * Tant qu'aucun fichier n'est renseigné, une pastille neutre occupe exactement
  * la même place — la mise en page ne bougera pas au moment de la remplacer.
  */
-function HeadlineVignette({ src }: { src: string | null }) {
+function HeadlineVignette({ src, slot }: { src: string | null; slot: number }) {
+  /* La boucle vit sur la vignette et non sur son enveloppe, qui porte déjà
+     l'animation d'apparition : deux animations sur un même élément se
+     remplacent au lieu de s'ajouter. `--slot` décale les trois pastilles. */
   const shape =
-    "relative block size-[0.78em] shrink-0 overflow-hidden rounded-full ring-1 ring-line";
+    "headline-float relative block size-[0.78em] shrink-0 overflow-hidden rounded-full ring-1 ring-line";
+  const phase = { "--slot": slot } as CSSProperties;
 
   if (!src) {
     return (
       <span
         aria-hidden
+        style={phase}
         className={cx(shape, "bg-gradient-to-br from-accent/30 via-surface-2 to-surface")}
       />
     );
   }
 
   return (
-    <span aria-hidden className={shape}>
+    <span aria-hidden style={phase} className={shape}>
       <Image
         src={src}
         /* Décoratives : le sens est porté par le texte du titre. */

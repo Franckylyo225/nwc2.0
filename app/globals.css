@@ -167,17 +167,6 @@
   }
 }
 
-/**
- * Panneau de service qui prend la main.
- *
- * Les panneaux inactifs sont en `hidden`, donc en `display: none` : ils ne
- * peuvent pas se fondre l'un dans l'autre — une transition n'a rien à
- * interpoler quand l'élément n'est pas rendu. On anime donc l'arrivée, et
- * elle se rejoue à chaque fois puisque l'élément réintègre le rendu.
- *
- * Le léger retrait d'échelle donne le sentiment que le panneau s'avance,
- * plutôt qu'il n'apparaît sur place.
- */
 /* ------------------------------------------- PARCOURS DE CONTACT ---
  * Modale en trois étapes. Les étapes ne coexistent jamais : une seule est
  * montée à la fois, d'où des animations d'arrivée plutôt que des
@@ -258,6 +247,17 @@
   }
 }
 
+/**
+ * Panneau de service qui prend la main.
+ *
+ * Les panneaux inactifs sont en `hidden`, donc en `display: none` : ils ne
+ * peuvent pas se fondre l'un dans l'autre — une transition n'a rien à
+ * interpoler quand l'élément n'est pas rendu. On anime donc l'arrivée, et
+ * elle se rejoue à chaque fois puisque l'élément réintègre le rendu.
+ *
+ * Le léger retrait d'échelle donne le sentiment que le panneau s'avance,
+ * plutôt qu'il n'apparaît sur place.
+ */
 @keyframes service-in {
   from {
     opacity: 0;
@@ -398,6 +398,35 @@
       calc((var(--n) - 1) * (var(--dot-size) + var(--dot-gap)))
     );
   }
+}
+
+/* ------------------------------------- VIGNETTES DU TITRE D'ACCUEIL ---
+ * Elles respirent en boucle, très légèrement : le titre n'a pas d'autre
+ * mouvement une fois posé, et ces trois pastilles suffisent à le garder
+ * vivant sans détourner de la lecture.
+ *
+ * Le décalage vient d'un délai NÉGATIF : l'animation démarre déjà entamée,
+ * plutôt qu'après une attente. Les trois vignettes bougent donc de façon
+ * décalée dès la première image, au lieu de partir ensemble puis de se
+ * désynchroniser.
+ *
+ * Rien à prévoir pour `prefers-reduced-motion` : la règle générale de ce
+ * fichier ramène toutes les durées à zéro et coupe la répétition.
+ * ------------------------------------------------------------------------*/
+
+@keyframes headline-float {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-22%) rotate(5deg);
+  }
+}
+
+.headline-float {
+  animation: headline-float 4.5s ease-in-out infinite;
+  animation-delay: calc(var(--slot, 0) * -1.5s);
 }
 
 /* ------------------------------------------- CARROUSEL DE RÉALISATIONS ---
