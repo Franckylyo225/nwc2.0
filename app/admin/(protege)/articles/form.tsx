@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { saveArticle } from "@/app/admin/actions";
 import { ResourceForm } from "@/components/admin/ResourceForm";
+import { getArticleCategories } from "@/lib/content";
 import { prisma } from "@/lib/db";
 import { storageMode } from "@/lib/upload";
 import { articleFields } from "../fields";
@@ -16,18 +17,21 @@ export async function ArticleForm({
   id?: string;
   variant?: "page" | "drawer";
 }) {
-  const row = id ? await prisma.article.findUnique({ where: { id } }) : null;
+  const [row, categories] = await Promise.all([
+    id ? await prisma.article.findUnique({ where: { id } }) : null,
+    getArticleCategories(),
+  ]);
   if (id && !row) notFound();
 
   return (
     <ResourceForm
-      fields={articleFields}
+      fields={articleFields(categories)}
       values={
         row
           ? {
             title: row.title,
             slug: row.slug,
-            category: row.category,
+            categoryId: row.categoryId,
             excerpt: row.excerpt,
             content: row.content,
             cover: row.cover,
@@ -37,7 +41,9 @@ export async function ArticleForm({
             publishedAt: row.publishedAt?.toISOString().slice(0, 10) ?? "",
           }
           : {
-            category: "NEWS",
+            /* La première rubrique par défaut : sans elle, la liste
+               s'ouvrirait sur un choix vide qu'aucun champ n'exige. */
+            categoryId: categories[0]?.id ?? "",
             published: false,
             publishedAt: new Date().toISOString().slice(0, 10),
           }

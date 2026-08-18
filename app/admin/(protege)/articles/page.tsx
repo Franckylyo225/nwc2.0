@@ -1,7 +1,6 @@
 import { removeArticle, toggleArticle } from "@/app/admin/actions";
 import { RowActions } from "@/components/admin/RowActions";
 import { List, PageHeader, Row } from "@/components/admin/shell";
-import { ARTICLE_CATEGORY_LABELS } from "@/lib/content";
 import { prisma } from "@/lib/db";
 
 export const dynamic = "force-dynamic";
@@ -15,13 +14,14 @@ const dateFormat = new Intl.DateTimeFormat("fr-FR", {
 export default async function ArticlesPage() {
   const articles = await prisma.article.findMany({
     orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
+    include: { category: { select: { name: true } } },
   });
 
   return (
     <>
       <PageHeader
         title="Actualités & blog"
-        description="Une seule liste, deux rubriques : les actualités et les articles de fond se distinguent par leur catégorie."
+        description="Une seule liste pour tout le journal ; la rubrique de chaque article les sépare à l\u2019affichage."
         action={{ href: "/admin/articles/nouveau", label: "Écrire un article" }}
       />
 
@@ -33,7 +33,7 @@ export default async function ArticlesPage() {
             muted={!article.published}
             meta={
               <>
-                <span>{ARTICLE_CATEGORY_LABELS[article.category]}</span>
+                <span>{article.category.name}</span>
                 <span aria-hidden>·</span>
                 <span>
                   {dateFormat.format(article.publishedAt ?? article.createdAt)}

@@ -102,8 +102,29 @@ Points communs à tous les contenus :
 - **Publié** — décoché, le contenu reste invisible sur le site public.
 - **Slug** — rempli automatiquement à partir du titre, modifiable.
 
-Actualités et articles de fond partagent une seule liste, séparés par leur
-catégorie. La page `/blog` propose un filtre entre les deux.
+Tout le journal partage une seule liste, séparé par la **rubrique** de chaque
+article. La page `/blog` en fait son filtre.
+
+### Rubriques du journal
+
+Elles se gèrent depuis **Paramètres**, en bas de page : une ligne par rubrique,
+avec son nom, son slug et son ordre d'affichage. Chacune s'enregistre seule —
+renommer l'une n'oblige pas à réenregistrer les autres.
+
+C'était auparavant une liste de deux valeurs figées dans le code : en ajouter
+une réclamait une migration et un déploiement.
+
+- Le **slug** apparaît dans l'adresse du filtre (`/blog?rubrique=actualites`).
+  À la création il se déduit du nom ; le changer ensuite casse les liens déjà
+  partagés, d'où un champ distinct plutôt qu'un renommage automatique.
+- L'**ordre** vaut pour le filtre du journal comme pour la liste déroulante du
+  formulaire d'article.
+- Une rubrique **ne se supprime pas** tant qu'elle classe des articles : le
+  message indique combien. La dernière rubrique ne se supprime jamais — un
+  article ne peut pas exister sans.
+
+Un slug inconnu dans l'URL — lien périmé, faute de frappe — n'affiche pas une
+page vide : le filtre est simplement ignoré.
 
 Le contenu des articles s'écrit en **Markdown** (`## titre`, `**gras**`,
 `- liste`, `[lien](url)`), rendu en HTML côté serveur.

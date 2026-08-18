@@ -123,7 +123,9 @@ export const productSchema = z.object({
 export const articleSchema = z.object({
   title: text("Le titre", 200),
   slug,
-  category: z.enum(["NEWS", "POST"]),
+  /* Un identifiant de rubrique. Son existence est vérifiée par la clé
+     étrangère : inutile de relire la table pour le confirmer ici. */
+  categoryId: text("La rubrique", 40),
   excerpt: text("Le chapô", 400),
   content: text("Le contenu", 60000),
   cover: optionalText,
@@ -299,6 +301,13 @@ export const HONEYPOT_FIELD = "site-web";
 
 /** Horodatage d'affichage du formulaire, posé par le navigateur. */
 export const RENDERED_AT_FIELD = "affiche-a";
+
+/** Rubrique du journal, gérée depuis la page Paramètres. */
+export const articleCategorySchema = z.object({
+  name: text("Le nom", 60),
+  slug,
+  position,
+});
 
 export const loginSchema = z.object({
   email: z.string().trim().toLowerCase().email("Adresse e-mail invalide."),

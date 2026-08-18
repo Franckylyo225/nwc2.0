@@ -112,7 +112,15 @@ export const productFields: Field[] = [
   published,
 ];
 
-export const articleFields: Field[] = [
+/**
+ * Champs de l'article. C'est une fonction et non une constante : la liste des
+ * rubriques vit en base, elle n'est donc connue qu'à l'exécution. La proposer
+ * depuis la même source que le filtre du journal évite d'offrir à la saisie une
+ * rubrique que le site public ne saurait pas filtrer.
+ */
+export const articleFields = (
+  categories: { id: string; name: string }[],
+): Field[] => [
   { type: "text", name: "title", label: "Titre", slugSource: true },
   {
     type: "slug",
@@ -122,12 +130,10 @@ export const articleFields: Field[] = [
   },
   {
     type: "select",
-    name: "category",
+    name: "categoryId",
     label: "Rubrique",
-    options: [
-      { value: "NEWS", label: "Actualité" },
-      { value: "POST", label: "Article de fond" },
-    ],
+    options: categories.map((c) => ({ value: c.id, label: c.name })),
+    help: "Les rubriques se gèrent depuis la page Paramètres.",
   },
   {
     type: "textarea",

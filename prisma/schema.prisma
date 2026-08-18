@@ -152,13 +152,18 @@ enum ProductStatus {
   SOON /// « Bientôt »
 }
 
-/// Actualités et articles de fond partagent le même modèle, séparés par
-/// `category` : une seule liste à administrer, deux rubriques à l'affichage.
+/// Tous les contenus du journal partagent ce modèle, séparés par leur
+/// rubrique : une seule liste à administrer, autant de rubriques qu'on veut
+/// à l'affichage.
 model Article {
   id          String          @id @default(cuid())
   title       String
   slug        String          @unique
-  category    ArticleCategory @default(NEWS)
+  /// Rubrique du journal. La suppression est bloquée tant qu'un article y
+  /// renvoie : perdre le classement d'un article publié serait plus grave que
+  /// d'obliger à le déplacer d'abord.
+  categoryId  String
+  category    ArticleCategory @relation(fields: [categoryId], references: [id], onDelete: Restrict)
   excerpt     String
   /// Corps de l'article en Markdown.
   content     String
@@ -170,12 +175,25 @@ model Article {
   updatedAt   DateTime        @updatedAt
 
   @@index([published, publishedAt])
-  @@index([category])
+  @@index([categoryId])
 }
 
-enum ArticleCategory {
-  NEWS /// Actualité de l'agence
-  POST /// Article de fond
+/// Rubriques du journal, gérées depuis la page Paramètres.
+///
+/// C'était une énumération de deux valeurs figées dans le code : en ajouter
+/// une réclamait une migration et un déploiement. Le studio peut désormais en
+/// créer autant qu'il veut sans quitter l'administration.
+model ArticleCategory {
+  id        String    @id @default(cuid())
+  name      String
+  /// Sert au filtre du journal : /blog?rubrique=<slug>.
+  slug      String    @unique
+  position  Int       @default(0)
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+  articles  Article[]
+
+  @@index([position])
 }
 
 model Testimonial {

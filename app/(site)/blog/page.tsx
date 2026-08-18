@@ -5,8 +5,7 @@ import { formatArticleDate } from "@/components/article-date";
 import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
 import { ArrowUpRight, Eyebrow, cx } from "@/components/ui";
-import { ARTICLE_CATEGORY_LABELS, getArticles } from "@/lib/content";
-import type { ArticleCategory } from "@/lib/generated/prisma";
+import { getArticleCategories, getArticles } from "@/lib/content";
 
 export const revalidate = 3600;
 
@@ -17,22 +16,27 @@ export const metadata: Metadata = {
   alternates: { canonical: "/blog" },
 };
 
-const FILTERS = [
-  { value: null, label: "Tout" },
-  { value: "NEWS" as const, label: "Actualités" },
-  { value: "POST" as const, label: "Articles" },
-];
-
 export default async function BlogIndex({
   searchParams,
 }: {
   searchParams: Promise<{ rubrique?: string }>;
 }) {
   const { rubrique } = await searchParams;
-  const active: ArticleCategory | null =
-    rubrique === "NEWS" || rubrique === "POST" ? rubrique : null;
+
+  /* Les rubriques viennent de la base : le filtre suit ce que le studio a
+     défini dans les paramètres, sans qu'aucune liste soit à tenir ici. */
+  const categories = await getArticleCategories();
+
+  /* Un slug inconnu — lien périmé, faute de frappe — ne filtre rien plutôt que
+     de renvoyer une page vide sans explication. */
+  const active = categories.some((c) => c.slug === rubrique) ? rubrique : undefined;
 
   const articles = await getArticles(active ? { category: active } : undefined);
+
+  const filters = [
+    { value: undefined, label: "Tout" },
+    ...categories.map((c) => ({ value: c.slug, label: c.name })),
+  ];
 
   return (
     <>
@@ -49,7 +53,7 @@ export default async function BlogIndex({
 
           {/* Filtres par rubrique — de simples liens, donc partageables. */}
           <nav className="mt-10 flex flex-wrap gap-2">
-            {FILTERS.map((filter) => {
+            {filters.map((filter) => {
               const isActive = filter.value === active;
               return (
                 <Link
@@ -96,7 +100,7 @@ export default async function BlogIndex({
                     <div className="flex flex-1 flex-col p-6">
                       <p className="flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-muted">
                         <span className="text-accent">
-                          {ARTICLE_CATEGORY_LABELS[article.category]}
+                          {article.category.name}
                         </span>
                         <span aria-hidden className="h-px w-4 bg-line-strong" />
                         <span>{formatArticleDate(article.publishedAt)}</span>

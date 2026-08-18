@@ -7,7 +7,7 @@ import { formatArticleDate } from "@/components/article-date";
 import { Footer } from "@/components/Footer";
 import { Nav } from "@/components/Nav";
 import { ArrowUpRight } from "@/components/ui";
-import { ARTICLE_CATEGORY_LABELS, getArticleBySlug, getArticleSlugs } from "@/lib/content";
+import { getArticleBySlug, getArticleSlugs } from "@/lib/content";
 
 export const revalidate = 3600;
 
@@ -68,7 +68,7 @@ export default async function ArticlePage({
 
           <p className="mt-8 flex items-center gap-3 text-xs uppercase tracking-[0.14em] text-muted">
             <span className="text-accent">
-              {ARTICLE_CATEGORY_LABELS[article.category]}
+              {article.category.name}
             </span>
             <span aria-hidden className="h-px w-6 bg-line-strong" />
             <span>{formatArticleDate(article.publishedAt)}</span>

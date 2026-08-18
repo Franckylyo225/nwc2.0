@@ -1,6 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
-import { ARTICLE_CATEGORY_LABELS, type ArticleSummary } from "@/lib/content";
+import type { ArticleSummary } from "@/lib/content";
 import { Reveal } from "./Reveal";
 import { ArrowUpRight, Button, Section, SectionHeading } from "./ui";
 import { formatArticleDate } from "./article-date";
@@ -51,7 +51,7 @@ export function LatestArticles({ items }: { items: ArticleSummary[] }) {
                 <div className="flex flex-1 flex-col p-6">
                   <p className="flex items-center gap-2 text-xs uppercase tracking-[0.14em] text-muted">
                     <span className="text-accent">
-                      {ARTICLE_CATEGORY_LABELS[article.category]}
+                      {article.category.name}
                     </span>
                     <span aria-hidden className="h-px w-4 bg-line-strong" />
                     <span>{formatArticleDate(article.publishedAt)}</span>

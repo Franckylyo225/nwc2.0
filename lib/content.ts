@@ -2,7 +2,7 @@ import "server-only";
 
 import { site } from "@/content/site";
 import { isDatabaseConfigured, prisma } from "./db";
-import type { ArticleCategory, ProductStatus } from "./generated/prisma";
+import type { ProductStatus } from "./generated/prisma";
 
 /**
  * Couche de lecture du contenu public.
@@ -58,11 +58,14 @@ export type TestimonialItem = {
   company: string;
 };
 
+/** Rubrique telle que l'affiche le site : seuls le nom et le slug servent. */
+export type CategoryRef = { name: string; slug: string };
+
 export type ArticleSummary = {
   id: string;
   title: string;
   slug: string;
-  category: ArticleCategory;
+  category: CategoryRef;
   excerpt: string;
   cover: string | null;
   author: string | null;
@@ -71,17 +74,28 @@ export type ArticleSummary = {
 
 export type ArticleFull = ArticleSummary & { content: string };
 
-/** Libellés affichés pour les statuts produit et les rubriques d'articles. */
+/** Libellés affichés pour les statuts produit. */
 export const PRODUCT_STATUS_LABELS: Record<ProductStatus, string> = {
   ONLINE: "En ligne",
   BETA: "Bêta",
   SOON: "Bientôt",
 };
 
-export const ARTICLE_CATEGORY_LABELS: Record<ArticleCategory, string> = {
-  NEWS: "Actualité",
-  POST: "Article",
-};
+/**
+ * Rubriques du journal, dans leur ordre d'affichage.
+ *
+ * Sert au filtre du journal comme à la liste déroulante de l'administration :
+ * une seule source, donc aucun risque de proposer à la saisie une rubrique que
+ * le site ne sait pas filtrer.
+ */
+export async function getArticleCategories() {
+  if (!isDatabaseConfigured()) return [];
+
+  return prisma.articleCategory.findMany({
+    orderBy: [{ position: "asc" }, { name: "asc" }],
+    include: { _count: { select: { articles: true } } },
+  });
+}
 
 /* ---------------------------------------------------------- Lectures --- */
 
@@ -202,7 +216,8 @@ export async function getTestimonials(): Promise<TestimonialItem[]> {
  * rubrique est simplement vide et les sections concernées ne s'affichent pas.
  */
 export async function getArticles(options?: {
-  category?: ArticleCategory;
+  /** Slug de rubrique — c'est lui qui circule dans l'URL du journal. */
+  category?: string;
   limit?: number;
 }): Promise<ArticleSummary[]> {
   if (!isDatabaseConfigured()) return [];
@@ -210,10 +225,11 @@ export async function getArticles(options?: {
   const rows = await prisma.article.findMany({
     where: {
       published: true,
-      ...(options?.category ? { category: options.category } : {}),
+      ...(options?.category ? { category: { slug: options.category } } : {}),
     },
     orderBy: [{ publishedAt: "desc" }, { createdAt: "desc" }],
     take: options?.limit,
+    include: { category: { select: { name: true, slug: true } } },
   });
 
   return rows.map(toSummary);
@@ -222,7 +238,10 @@ export async function getArticles(options?: {
 export async function getArticleBySlug(slug: string): Promise<ArticleFull | null> {
   if (!isDatabaseConfigured()) return null;
 
-  const row = await prisma.article.findFirst({ where: { slug, published: true } });
+  const row = await prisma.article.findFirst({
+    where: { slug, published: true },
+    include: { category: { select: { name: true, slug: true } } },
+  });
   if (!row) return null;
 
   return { ...toSummary(row), content: row.content };
@@ -243,7 +262,7 @@ function toSummary(row: {
   id: string;
   title: string;
   slug: string;
-  category: ArticleCategory;
+  category: CategoryRef;
   excerpt: string;
   cover: string | null;
   author: string | null;

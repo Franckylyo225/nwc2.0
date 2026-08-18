@@ -8,12 +8,14 @@ import { prisma } from "@/lib/db";
 import type { MessageStatus } from "@/lib/generated/prisma";
 import {
   SETTINGS_IMAGE_FIELDS,
+  articleCategorySchema,
   articleSchema,
   fieldErrorsOf,
   loginSchema,
   settingsSchema,
   productSchema,
   serviceSchema,
+  slugify,
   testimonialSchema,
   workSchema,
 } from "@/lib/schemas";
@@ -116,6 +118,84 @@ export async function saveSettings(
   revalidatePath("/", "layout");
   revalidatePath("/admin/parametres");
   return { ok: true };
+}
+
+/* ------------------------------------------------- Rubriques du journal --- */
+
+/**
+ * Les rubriques ne passent pas par la fabrique de collections : elles ne se
+ * publient pas, n'ont pas d'image, et leur suppression demande une garde que
+ * les autres n'ont pas.
+ */
+export async function saveArticleCategory(
+  id: string | null,
+  _previous: ActionState,
+  formData: FormData,
+): Promise<ActionState> {
+  await requireUser();
+
+  const raw = Object.fromEntries(formData.entries());
+  /* Le slug se déduit du nom quand il est laissé vide : on ne demande pas à
+     l'utilisateur de composer une chaîne d'URL pour ajouter une rubrique. */
+  if (!raw.slug) raw.slug = slugify(String(raw.name ?? ""));
+
+  const parsed = articleCategorySchema.safeParse(raw);
+  if (!parsed.success) {
+    return {
+      error: "Certains champs sont invalides.",
+      fieldErrors: fieldErrorsOf(parsed.error),
+    };
+  }
+
+  try {
+    if (id) {
+      await prisma.articleCategory.update({ where: { id }, data: parsed.data });
+    } else {
+      await prisma.articleCategory.create({ data: parsed.data });
+    }
+  } catch (error) {
+    return toMessage(error);
+  }
+
+  revalidateCategories();
+  return { ok: true };
+}
+
+export async function removeArticleCategory(id: string): Promise<ActionState> {
+  await requireUser();
+
+  /* Refus explicite plutôt que l'erreur de contrainte brute : la base dirait
+     « Foreign key constraint failed », ce qui ne dit pas quoi faire. */
+  const used = await prisma.article.count({ where: { categoryId: id } });
+  if (used > 0) {
+    return {
+      error: `Cette rubrique classe encore ${used} article${used > 1 ? "s" : ""}. Déplacez-les dans une autre rubrique avant de la supprimer.`,
+    };
+  }
+
+  const remaining = await prisma.articleCategory.count();
+  if (remaining <= 1) {
+    return {
+      error: "Gardez au moins une rubrique : un article ne peut pas exister sans.",
+    };
+  }
+
+  try {
+    await prisma.articleCategory.delete({ where: { id } });
+  } catch (error) {
+    return toMessage(error);
+  }
+
+  revalidateCategories();
+  return {};
+}
+
+/** Le journal et son filtre dépendent des rubriques, l'admin aussi. */
+function revalidateCategories() {
+  revalidatePath("/blog");
+  revalidatePath("/");
+  revalidatePath("/admin/parametres");
+  revalidatePath("/admin/articles");
 }
 
 /* -------------------------------------------------------------- Messages --- */

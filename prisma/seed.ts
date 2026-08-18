@@ -180,13 +180,32 @@ async function main() {
     console.log("→ Témoignages déjà présents, ignorés.");
   }
 
+  /* -------------------------------------------------- Rubriques du journal */
+  /* Créées avant les articles : un article ne peut pas exister sans rubrique.
+     Elles se gèrent ensuite depuis Paramètres → Rubriques du journal. */
+  if ((await prisma.articleCategory.count()) === 0) {
+    await prisma.articleCategory.createMany({
+      data: [
+        { name: "Actualité", slug: "actualites", position: 0 },
+        { name: "Article de fond", slug: "articles", position: 1 },
+      ],
+    });
+    console.log("✓ 2 rubriques de journal créées");
+  } else {
+    console.log("→ Rubriques déjà présentes, ignorées.");
+  }
+
   /* ------------------------------------------------------------ Articles */
   if ((await prisma.article.count()) === 0) {
+    const rubrique = await prisma.articleCategory.findFirstOrThrow({
+      orderBy: { position: "asc" },
+    });
+
     await prisma.article.create({
       data: {
         title: "New Wave Conception ouvre son journal",
         slug: "ouverture-du-journal",
-        category: "NEWS",
+        categoryId: rubrique.id,
         excerpt:
           "Cet article d'exemple montre le rendu d'une actualité. Modifie-le ou supprime-le depuis l'administration.",
         content: [
