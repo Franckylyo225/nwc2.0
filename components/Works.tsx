@@ -55,11 +55,6 @@ export function Works({ items }: { items: WorkItem[] }) {
             <h2 className="display text-4xl sm:text-5xl lg:text-[3.5rem]">
               {works.title}
             </h2>
-            {/* Le propos de la section vit ici, une fois : chaque fiche porte
-                désormais la description de son propre projet. */}
-            <p className="max-w-xl text-lg leading-relaxed text-white/55">
-              {works.intro}
-            </p>
           </Reveal>
         }
       >

@@ -227,8 +227,8 @@ export const site = {
   works: {
     eyebrow: "Réalisations",
     title: "Projets récents",
-    intro:
-      "Nous accompagnons des entreprises de secteurs très différents, de la première idée à la mise en ligne. Voici une sélection de projets récents.",
+    /* Pas de chapô ici : le carrousel enchaîne sous le titre, et chaque fiche
+       porte déjà le résumé de son propre projet. */
     /**
      * Les projets défilent un par un, en grand. Chaque fiche affiche l'année,
      * le rôle tenu et les prestations livrées.
