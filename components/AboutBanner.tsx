@@ -52,8 +52,14 @@ export function AboutBanner({ image }: { image: string | null }) {
               <span className="sr-only">{brand.name}</span>
             </p>
 
+            {/* `min-w-0` sur les deux cellules : une cellule de grille vaut par
+                défaut `min-width: auto`, c'est-à-dire au moins la largeur
+                intrinsèque de son contenu. Le carrousel, dont les diapositives
+                font `flex: 0 0 100%`, réclamait alors la largeur naturelle de
+                ses textes au lieu de défiler — il élargissait la colonne, donc
+                la carte, donc la page entière, qui débordait sur téléphone. */}
             <div className="mt-10 grid gap-8 sm:mt-14 sm:gap-10 lg:mt-16 lg:grid-cols-[minmax(0,1fr)_auto] lg:items-end lg:gap-16">
-              <div>
+              <div className="min-w-0">
                 {/* L'interlignage d'affichage (0.98) est calibré pour un titre
                     d'une ou deux lignes. Sur un téléphone celui-ci en fait
                     quatre : il faut le desserrer, sinon les lignes se touchent. */}
@@ -92,7 +98,7 @@ function StatCarousel() {
   if (!stats.length) return null;
 
   return (
-    <div className="stat-carousel w-full lg:w-72">
+    <div className="stat-carousel w-full min-w-0 lg:w-72">
       <div
         className="stat-scroller"
         tabIndex={0}
