@@ -450,7 +450,7 @@ export const site = {
       "Racontez-nous en deux lignes ce que vous voulez construire. Réponse sous 24 h ouvrées, sans engagement.",
 
     email: "hello@nwc-agency.com",
-    phone: "+225 07 58 16 09 04",
+    phone: "+225 07 10 00 71 29",
     address: "Codody, Abidjan",
     /** Affichés dans le pied de page. Retire les entrées que tu n'utilises pas. */
     socials: [
