@@ -7,21 +7,9 @@ const { footer, brand, contact } = site;
 
 export function Footer() {
   return (
-    <>
-      {/* Aligné sur la colonne du site, pas sur la fenêtre. `overflow-hidden`
-          retient un nom plus long que la colonne. */}
-      <div className="shell overflow-hidden">
-        <Wordmark text={brand.name} />
-      </div>
-      <FooterBody />
-    </>
-  );
-}
-
-function FooterBody() {
-  return (
-    <footer className="border-t border-line bg-surface/60">
-      <div className="shell py-16 sm:py-20">
+    /* `overflow-hidden` sert au bandeau du bas, qui déborde volontairement. */
+    <footer className="overflow-hidden border-t border-line bg-surface/60">
+      <div className="shell pt-16 sm:pt-20">
         <div className="grid gap-12 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
           {/* Marque */}
           <div className="flex flex-col gap-5">
@@ -94,6 +82,12 @@ function FooterBody() {
             <ArrowUpRight className="size-3.5 -rotate-45" />
           </a>
         </div>
+
+        {/* Dernière chose de la page. La marge négative fait passer le bas des
+            lettres sous le bord du pied de page, que l'`overflow-hidden`
+            tranche : le mot semble continuer au-delà de l'écran. Le dégradé
+            l'éteint avant, pour que la coupe ne se lise pas comme un défaut. */}
+        <Wordmark text={brand.name} className="-mb-[0.3em] mt-12 sm:mt-16" />
       </div>
     </footer>
   );

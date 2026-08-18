@@ -77,7 +77,7 @@ Le présent site est édité par :
 
 ## 2. Direction de la publication
 
-Le directeur de la publication est [À REMPLIR — prénom, nom et qualité du représentant légal], en sa qualité de représentant légal de ${brand.name}.
+Le directeur de la publication est Franck TCHETEHO, en sa qualité de représentant légal de ${brand.name}.
 
 Toute question relative au contenu du site peut lui être adressée à [${contact.email}](mailto:${contact.email}).
 
@@ -252,7 +252,7 @@ Toute commande implique l'acceptation sans réserve des présentes CGV, qui pré
 
 ## 2. Devis et formation du contrat
 
-Chaque prestation fait l'objet d'un devis détaillé, précisant le périmètre, les livrables, le calendrier et le prix. Le devis est valable **[À REMPLIR — ex. 30 jours]** à compter de sa date d'émission.
+Chaque prestation fait l'objet d'un devis détaillé, précisant le périmètre, les livrables, le calendrier et le prix. Le devis est valable **30 jours** à compter de sa date d'émission.
 
 Le contrat est formé à la réception par le Prestataire du devis daté, signé et accompagné de la mention « bon pour accord », ainsi que de l'acompte prévu à l'article 4.
 
@@ -269,11 +269,9 @@ Les frais de tiers nécessaires au projet — nom de domaine, hébergement, lice
 Sauf stipulation contraire du devis, le règlement s'effectue selon l'échéancier suivant :
 
 - **50%** à la commande, à titre d'acompte ;
-- le solde à la livraison, avant mise en ligne.
+- **50%** (le solde) à la livraison, avant mise en ligne.
 
-Les paiements se font par **[À REMPLIR — ex. virement bancaire, Wave, Orange Money]**, à **[À REMPLIR — ex. 30 jours]** date de facture pour les échéances autres que l'acompte.
-
-Tout retard de paiement entraîne de plein droit, sans mise en demeure préalable, l'application de pénalités au taux de **[À REMPLIR — ex. 1,5 % par mois de retard]**, ainsi que la suspension des prestations en cours après un préavis de sept jours ouvrés notifié par écrit.
+Les paiements se font par **virement bancaire, chèque ou Mobile Money**.
 
 ## 5. Obligations du Client
 
@@ -281,7 +279,7 @@ La qualité et le respect du calendrier dépendent directement de la collaborati
 
 - désigner un interlocuteur unique, habilité à valider les étapes du projet ;
 - fournir en temps utile les contenus nécessaires — textes, images, logos, accès techniques — dans les formats convenus ;
-- répondre aux demandes de validation dans un délai de ** 3 jours ouvrés** ;
+- répondre aux demandes de validation dans un délai de **3 jours ouvrés** ;
 - garantir qu'il détient les droits sur les éléments qu'il transmet.
 
 Le Client garantit le Prestataire contre toute réclamation d'un tiers relative aux contenus qu'il a fournis.
@@ -318,7 +316,7 @@ Sauf refus écrit du Client, le Prestataire peut citer son nom, reproduire les c
 
 La livraison n'emporte ni hébergement, ni maintenance, ni infogérance, sauf prestation distincte prévue au devis ou contrat de maintenance séparé.
 
-Le Prestataire garantit la correction, pendant **[À REMPLIR — ex. 3 mois]** à compter de la recette, des dysfonctionnements imputables à son travail. Sont exclus de cette garantie : les modifications apportées par le Client ou par un tiers, les défaillances des services externes, les évolutions des navigateurs et des systèmes intervenues après la livraison, et tout usage non conforme.
+Le Prestataire garantit la correction, pendant **2 mois** à compter de la recette, des dysfonctionnements imputables à son travail. Sont exclus de cette garantie : les modifications apportées par le Client ou par un tiers, les défaillances des services externes, les évolutions des navigateurs et des systèmes intervenues après la livraison, et tout usage non conforme.
 
 ## 10. Droit de rétractation
 
