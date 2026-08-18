@@ -35,9 +35,14 @@ export function Works({ items }: { items: WorkItem[] }) {
     <>
       {/* En-tête posé sur le fond clair de la page : la pastille, puis le titre
           en très grand que le bord de la section sombre vient trancher. */}
-      <Reveal className="shell pt-16 text-ink sm:pt-20">
+      <Reveal className="shell overflow-hidden pt-16 sm:pt-20">
         <p className="mb-6 text-center text-sm text-muted">({works.eyebrow})</p>
-        <Wordmark id="works" text={works.title} />
+        {/* Deux mots de moins que le nom de la marque : le corps peut monter
+            sans que la ligne déborde de la colonne. */}
+        <Wordmark
+          text={works.title}
+          className="text-[clamp(2.5rem,13.5vw,12.5rem)]"
+        />
       </Reveal>
 
       {/* `relative` sert de repère aux décors : ils sont posés par le carrousel

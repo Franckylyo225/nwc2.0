@@ -8,11 +8,10 @@ const { footer, brand, contact } = site;
 export function Footer() {
   return (
     <>
-      {/* Aligné sur la colonne du site, pas sur la fenêtre : le bandeau
-          commence et finit là où commence et finit le contenu en dessous.
-          `text-ink` donne sa couleur au dégradé, tiré de `currentColor`. */}
-      <div className="shell">
-        <Wordmark id="footer" text={brand.name} className="text-ink" />
+      {/* Aligné sur la colonne du site, pas sur la fenêtre. `overflow-hidden`
+          retient un nom plus long que la colonne. */}
+      <div className="shell overflow-hidden">
+        <Wordmark text={brand.name} />
       </div>
       <FooterBody />
     </>
