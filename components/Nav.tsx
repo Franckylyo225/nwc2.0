@@ -45,7 +45,7 @@ export function Nav() {
           onClick={() => setOpen(false)}
         >
           <Logo />
-          <span className="hidden text-[0.95rem] font-semibold leading-tight tracking-tight sm:block">
+          <span className="text-[0.95rem] font-semibold leading-tight tracking-tight">
             New Wave
             <span className="block text-[0.7rem] font-normal uppercase tracking-[0.2em] text-muted">
               Conception
@@ -142,10 +142,11 @@ export function Nav() {
 /** Monogramme « NWC » — remplace-le par ton logo si tu en as un. */
 function Logo() {
   return (
-    /* Le nom de la marque n'est écrit qu'à partir de `sm` : l'icône porte donc
-       le nom accessible du lien, sans quoi il serait vide sur mobile. */
+    /* Le nom de la marque est écrit en toutes lettres à côté, à toutes les
+       largeurs : l'icône n'a donc pas de `title`, sous peine de faire annoncer
+       « New Wave Conception » deux fois de suite par un lecteur d'écran. */
     <span className="grid size-10 place-items-center rounded-[0.7rem] bg-ink text-white transition-colors group-hover:bg-accent">
-      <BrandMark title="New Wave Conception" />
+      <BrandMark />
     </span>
   );
 }
