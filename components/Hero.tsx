@@ -44,7 +44,7 @@ export function Hero({
           </div>
         ) : null}
 
-        <h1 className="mx-auto flex max-w-[760px] flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[56px] font-bold leading-[1.18] tracking-[-0.01em] text-[#0A0A0A]">
+        <h1 className="mx-auto flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[26px] font-bold leading-[1.25] tracking-[-0.01em] text-[#0A0A0A] sm:max-w-[560px] sm:text-[38px] sm:leading-[1.2] lg:max-w-[760px] lg:text-[56px] lg:leading-[1.18]">
           {headline.map((part, i) => (
             <span
               key={i}
@@ -82,7 +82,7 @@ export function Hero({
 
         {/* CTA */}
         <div
-          className="rise mt-8 flex items-center justify-center gap-[14px]"
+          className="rise mt-8 flex w-full flex-col items-center gap-3 sm:w-auto sm:flex-row sm:gap-[14px]"
           style={delay(afterTitle + 1)}
         >
           <Button
