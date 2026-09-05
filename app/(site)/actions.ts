@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { isOverQuota, senderHash } from "@/lib/contact";
 import { isDatabaseConfigured, prisma } from "@/lib/db";
+import { notifyNewMessage } from "@/lib/email";
 import {
   HONEYPOT_FIELD,
   RENDERED_AT_FIELD,
@@ -77,6 +78,7 @@ export async function sendMessage(
     }
 
     await prisma.message.create({ data: { ...parsed.data, senderHash: hash } });
+    await notifyNewMessage(parsed.data);
   } catch {
     /* L'erreur technique reste dans les journaux : la montrer au visiteur
        exposerait la base sans l'aider en quoi que ce soit. */
