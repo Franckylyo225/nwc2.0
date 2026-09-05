@@ -44,7 +44,7 @@ export function Hero({
           </div>
         ) : null}
 
-        <h1 className="mx-auto flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[26px] font-bold leading-[1.25] tracking-[-0.01em] text-[#0A0A0A] sm:max-w-[560px] sm:text-[38px] sm:leading-[1.2] lg:max-w-[760px] lg:text-[56px] lg:leading-[1.18]">
+        <h1 className="display mx-auto flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[26px] text-[#0A0A0A] sm:max-w-[560px] sm:text-[38px] lg:max-w-[760px] lg:text-[56px]">
           {headline.map((part, i) => (
             <span
               key={i}
