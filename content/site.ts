@@ -181,14 +181,14 @@ export const site = {
       {
         title: "Sites vitrines & landing pages",
         description:
-          "Un site clair, rapide, qui explique ce que vous faites et transforme le visiteur en contact.",
+          "Nous concevons des sites clairs, rapides et pensés pour convertir — chaque page a un objectif, chaque élément guide le visiteur vers l'action.",
         bullets: ["Design sur-mesure", "Rédaction assistée", "Responsive complet"],
         image: null as string | null,
       },
       {
         title: "Identité visuelle & logo",
         description:
-          "Une identité cohérente : logo, palette, typographies, règles d'usage. Livrée prête à l'emploi.",
+          "Une marque forte commence par une identité qu'on reconnaît au premier coup d'œil.",
         bullets: ["Logo & déclinaisons", "Charte graphique", "Kit réseaux sociaux"],
         image: null as string | null,
       },
@@ -209,7 +209,7 @@ export const site = {
       {
         title: "Applications web sur-mesure",
         description:
-          "Espaces clients, tableaux de bord, outils métier. Développés proprement, pensés pour durer.",
+          "Quand aucune solution existante ne répond à votre besoin, nous la construisons pour vous.",
         bullets: ["Next.js / React", "API & intégrations", "Hébergement inclus"],
         image: null as string | null,
       },
@@ -457,10 +457,9 @@ export const site = {
     address: "Codody, Abidjan",
     /** Affichés dans le pied de page. Retire les entrées que tu n'utilises pas. */
     socials: [
-      { label: "LinkedIn", href: "[À REMPLIR — url LinkedIn]" },
-      { label: "Instagram", href: "[À REMPLIR — url Instagram]" },
-      { label: "Behance", href: "[À REMPLIR — url Behance]" },
-      { label: "Dribbble", href: "[À REMPLIR — url Dribbble]" },
+      { label: "LinkedIn", href: "https://www.linkedin.com/company/13022215/" },
+      { label: "Facebook", href: "https://www.facebook.com/NewWaveConception" },
+      { label: "Instagram", href: "https://www.instagram.com/newwaveconception/" },
     ],
 
     /**
