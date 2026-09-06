@@ -16,6 +16,18 @@ type HeadlinePart = {
 
 const headline: readonly HeadlinePart[] = hero.headline;
 
+/**
+ * Répartition du titre sur 4 lignes, telle que voulue pour le hero — un
+ * découpage fixe des 7 fragments de `content/site.ts`, pas une règle
+ * générale : une nouvelle rédaction du titre demandera d'ajuster ces bornes.
+ */
+const HEADLINE_LINES: readonly [number, number][] = [
+  [0, 1],
+  [1, 3],
+  [3, 5],
+  [5, 7],
+];
+
 /** Cascade d'apparition : 70 ms entre chaque élément. */
 const delay = (step: number) => ({ "--delay": `${step * 70}ms` }) as CSSProperties;
 
@@ -44,30 +56,40 @@ export function Hero({
           </div>
         ) : null}
 
-        <h1 className="display mx-auto flex flex-wrap items-center justify-center gap-x-2 gap-y-1 text-center text-[26px] text-[#0A0A0A] sm:max-w-[560px] sm:text-[38px] lg:max-w-[760px] lg:text-[56px]">
-          {headline.map((part, i) => (
+        <h1 className="display mx-auto flex flex-col items-center gap-y-1 text-center text-[26px] text-[#0A0A0A] sm:max-w-[560px] sm:text-[38px] lg:max-w-[760px] lg:text-[56px]">
+          {HEADLINE_LINES.map(([start, end], lineIndex) => (
             <span
-              key={i}
-              className="inline-flex items-center gap-2 overflow-hidden pb-[0.12em]"
+              key={lineIndex}
+              className="flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-1"
             >
-              <span
-                className={cx(
-                  "rise-mask inline-block",
-                  part.accent && "text-[#EC4C79]",
-                )}
-                style={delay(i + 1)}
-              >
-                {part.text}
-              </span>
+              {headline.slice(start, end).map((part, j) => {
+                const i = start + j;
+                return (
+                  <span
+                    key={i}
+                    className="inline-flex items-center gap-2 overflow-hidden pb-[0.12em]"
+                  >
+                    <span
+                      className={cx(
+                        "rise-mask inline-block",
+                        part.accent && "text-[#EC4C79]",
+                      )}
+                      style={delay(i + 1)}
+                    >
+                      {part.text}
+                    </span>
 
-              {part.imageSlot ? (
-                <span className="rise inline-block" style={delay(i + 1.5)}>
-                  <HeadlineVignette
-                    src={images[part.imageSlot] ?? null}
-                    slot={part.imageSlot}
-                  />
-                </span>
-              ) : null}
+                    {part.imageSlot ? (
+                      <span className="rise inline-block" style={delay(i + 1.5)}>
+                        <HeadlineVignette
+                          src={images[part.imageSlot] ?? null}
+                          slot={part.imageSlot}
+                        />
+                      </span>
+                    ) : null}
+                  </span>
+                );
+              })}
             </span>
           ))}
         </h1>
